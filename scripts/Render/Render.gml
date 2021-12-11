@@ -44,7 +44,7 @@ function Render(_game_controller/*:GameController*/) constructor {
 		}
 		
 		var current_player = __game_controller.__current_player;
-		var selected_square/*:Square*/ = (/*#cast*/ current_player.__brain /*#as HumanBrain*/).get_selected_square();
+		var selected_square/*:Square*/ = (/*#cast*/ current_player.__brain /*#as BrainHuman*/).get_selected_square();
 		if (selected_square != undefined) {
 			var position = selected_square.get_position();
 			var X = __board_shift.x + position.x * __square_size;
@@ -52,7 +52,7 @@ function Render(_game_controller/*:GameController*/) constructor {
 			draw_set_color(c_red);
 			draw_rectangle(X, Y, X + __square_size, Y + __square_size, true);
 		}
-		var available_turns = (/*#cast*/ current_player.__brain /*#as HumanBrain*/).get_available_turns();
+		var available_turns = (/*#cast*/ current_player.__brain /*#as BrainHuman*/).get_available_turns();
 		var array_of_available_turns = available_turns.get_array_of_turns();
 		for (var i = 0, size_i = array_length(array_of_available_turns); i < size_i; i++) {
 			var available_turn = array_of_available_turns[i];

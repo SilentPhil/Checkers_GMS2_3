@@ -6,7 +6,7 @@
     "path": "folders/Scripts/Game.yy",
   },
   "resourceVersion": "1.0",
-  "name": "Render",
+  "name": "TurnCollection",
   "tags": [],
   "resourceType": "GMScript",
 }

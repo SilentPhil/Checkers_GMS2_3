@@ -2,11 +2,11 @@
   "isDnD": false,
   "isCompatibility": false,
   "parent": {
-    "name": "Game",
-    "path": "folders/Scripts/Game.yy",
+    "name": "Board",
+    "path": "folders/Scripts/Board.yy",
   },
   "resourceVersion": "1.0",
-  "name": "Render",
+  "name": "Piece",
   "tags": [],
   "resourceType": "GMScript",
 }

@@ -28,7 +28,7 @@ enum PIECE_COLOR {
 	WHITE
 }
 
-enum SQUARE_NEIGHBOUR {
+enum DIRECTION {
 	NW,	// северо-запад - слева-сверху
 	NE, // северо-восток - справа-сверху
 	SE,	// юго-восток - справа-снизу
