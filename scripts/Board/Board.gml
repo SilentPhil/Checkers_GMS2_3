@@ -38,10 +38,13 @@ function Board(_players/*:Player[]*/) constructor {
 		}
 	}
 	
-	/// @todo Странно указывать старую клетку при движении. Может шашка будет хранить текущую клетку?
-	static move_piece = function(_piece/*:Piece*/, _old_square/*:Square*/, _new_square/*:Square*/)/*->void*/ {
-		_old_square.__piece = undefined;
-		_new_square.set_piece(_piece);
+	static move_piece = function(_old_square/*:Square*/, _new_square/*:Square*/)/*->void*/ {
+		_new_square.set_piece(_old_square.get_piece());
+		_old_square.reset_piece();
+	}
+	
+	static delete_piece = function(_square/*:Square*/)/*->void*/ {
+		_square.reset_piece();
 	}
 	
 	static get_available_turns = function(_square/*:Square*/)/*->TurnCollection*/ {
@@ -57,13 +60,13 @@ function Board(_players/*:Player[]*/) constructor {
 				var neigbour_square/*:Square*/	= _square.get_neighbour(movement_neighbour);
 				if (neigbour_square != undefined) {
 					if (!neigbour_square.is_has_piece()) {
-						available_turns.push_turn(new Turn(_square.get_piece(), _square, neigbour_square));
+						available_turns.push_turn(new Turn(piece_player, _square, neigbour_square));
 					} else if (neigbour_square.is_has_piece(get_other_player(piece_player))) {
 						// В этом поле находится фишка врага, нужно посмотреть, можно ли ее перепрыгнуть в том же направлении
 						var attack_neighbour_square/*:Square*/ = neigbour_square.get_neighbour(movement_neighbour);
 						if (attack_neighbour_square != undefined) {
 							if (!attack_neighbour_square.is_has_piece()) {
-								available_turns.push_turn(new Turn(_square.get_piece(), _square, attack_neighbour_square, neigbour_square));
+								available_turns.push_turn(new Turn(piece_player, _square, attack_neighbour_square, neigbour_square));
 							}
 						}
 					}
