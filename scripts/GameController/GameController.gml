@@ -5,7 +5,6 @@ function GameController() constructor {
 				];
 
 	__board 			= new Board(__players);
-	__turn				= new Turn(1);
 	__current_player	= __players[0]; /// @is {Player}
 	
 	static next_turn = function()/*->void*/ {
@@ -21,6 +20,14 @@ function GameController() constructor {
 	
 	static get_board = function()/*->Board*/ {
 		return __board;
+	}
+	
+	static get_current_player = function()/*->Player*/ {
+		return __current_player;
+	}
+	
+	static get_current_player_index = function()/*->number*/ {
+		return array_find_index(__players, __current_player);
 	}
 }
 
@@ -54,8 +61,7 @@ function Brain(_player/*:Player*/) constructor {
 function HumanBrain(_player/*:Player*/, _render/*:Render*/) : Brain(_player) constructor {
 	__render			= _render;		/// @is {Render}
 	__selected_square	= undefined;	/// @is {Square?}
-	// __current_state 	= HUMAN_CONTROL_STATE.SELECT_SQUARE; /// @is {HUMAN_CONTROL_STATE}
-	__available_squares_for_move = []; /// @is {Square[]}
+	__available_turns	= new TurnCollection();	/// @is {TurnCollection}
 	
 	/// @override
 	static step = function()/*->bool*/ {
@@ -64,15 +70,18 @@ function HumanBrain(_player/*:Player*/, _render/*:Render*/) : Brain(_player) con
 			var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
 			if (square_under_mouse != undefined && square_under_mouse.is_has_piece(__player)) {
 				__selected_square = square_under_mouse;
-				__available_squares_for_move = board.get_available_turns(__selected_square);
+				__available_turns = board.get_available_turns(__selected_square);
 			}
 			
-			if (__selected_square != undefined && array_find_index(__available_squares_for_move, square_under_mouse) != -1) {
-				// move!
-				board.move_piece(__selected_square.get_piece(), __selected_square, square_under_mouse);
-				__selected_square = undefined;
-				__available_squares_for_move = [];
-				return true;
+			if (__selected_square != undefined) {
+				if (__available_turns.is_turn_exists(square_under_mouse)) {
+					// move!
+					/// @todo Тут нужно отправить Turn на выполнение
+					board.move_piece(__selected_square.get_piece(), __selected_square, square_under_mouse);
+					__selected_square = undefined;
+					__available_turns = new TurnCollection();
+					return true;
+				}
 			}
 		}
 		return false;
@@ -82,8 +91,8 @@ function HumanBrain(_player/*:Player*/, _render/*:Render*/) : Brain(_player) con
 		return __selected_square;
 	}
 	
-	static get_available_squares_for_move = function()/*->Square[]*/ {
-		return __available_squares_for_move;
+	static get_available_turns = function()/*->TurnCollection*/ {
+		return __available_turns;
 	}
 	
 	enum HUMAN_CONTROL_STATE {

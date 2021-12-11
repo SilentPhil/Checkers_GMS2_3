@@ -44,8 +44,8 @@ function Board(_players/*:Player[]*/) constructor {
 		_new_square.set_piece(_piece);
 	}
 	
-	static get_available_turns = function(_square/*:Square*/)/*->Square[]*/ {
-		var array_of_available_squares/*:Square[]*/ = [];
+	static get_available_turns = function(_square/*:Square*/)/*->TurnCollection*/ {
+		var available_turns = new TurnCollection();
 		
 		if (_square.is_has_piece()) {
 			var piece/*:Piece*/ 	= _square.get_piece();
@@ -57,13 +57,13 @@ function Board(_players/*:Player[]*/) constructor {
 				var neigbour_square/*:Square*/	= _square.get_neighbour(movement_neighbour);
 				if (neigbour_square != undefined) {
 					if (!neigbour_square.is_has_piece()) {
-						array_push(array_of_available_squares, neigbour_square);
+						available_turns.push_turn(new Turn(_square.get_piece(), _square, neigbour_square));
 					} else if (neigbour_square.is_has_piece(get_other_player(piece_player))) {
 						// В этом поле находится фишка врага, нужно посмотреть, можно ли ее перепрыгнуть в том же направлении
 						var attack_neighbour_square/*:Square*/ = neigbour_square.get_neighbour(movement_neighbour);
 						if (attack_neighbour_square != undefined) {
 							if (!attack_neighbour_square.is_has_piece()) {
-								array_push(array_of_available_squares, attack_neighbour_square);
+								available_turns.push_turn(new Turn(_square.get_piece(), _square, attack_neighbour_square, neigbour_square));
 							}
 						}
 					}
@@ -71,7 +71,7 @@ function Board(_players/*:Player[]*/) constructor {
 			}
 		}
 		
-		return array_of_available_squares;
+		return available_turns;
 	}
 	
 	static get_width = function()/*->number*/ {

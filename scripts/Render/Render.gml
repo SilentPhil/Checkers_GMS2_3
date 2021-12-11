@@ -17,6 +17,12 @@ function Render(_game_controller/*:GameController*/) constructor {
 	static draw = function()/*->void*/ {
 		var board = __game_controller.get_board();
 		
+		draw_set_color(__piece_color[__game_controller.get_current_player_index()]);
+		draw_line_width(0, 0, room_width, 0, 30);
+		draw_line_width(room_width, 0, room_width, room_height, 30);
+		draw_line_width(room_width, room_height, 0, room_height, 30);
+		draw_line_width(0, room_height, 0, 0, 30);
+		
 		for (var i = 0; i < board.get_width(); i++) {
 			for (var j = 0; j < board.get_height(); j++) {
 				var square = board.get_square(i, j);
@@ -46,14 +52,23 @@ function Render(_game_controller/*:GameController*/) constructor {
 			draw_set_color(c_red);
 			draw_rectangle(X, Y, X + __square_size, Y + __square_size, true);
 		}
-		var available_squares_for_move = (/*#cast*/ current_player.__brain /*#as HumanBrain*/).get_available_squares_for_move();
-		for (var i = 0, size_i = array_length(available_squares_for_move); i < size_i; i++) {
-			var available_square = available_squares_for_move[i];
-			var position = available_square.get_position();
-			var X = __board_shift.x + position.x * __square_size;
-			var Y = __board_shift.y + position.y * __square_size;
+		var available_turns = (/*#cast*/ current_player.__brain /*#as HumanBrain*/).get_available_turns();
+		var array_of_available_turns = available_turns.get_array_of_turns();
+		for (var i = 0, size_i = array_length(array_of_available_turns); i < size_i; i++) {
+			var available_turn = array_of_available_turns[i];
+			var move_square_position = available_turn.get_square_to().get_position();
+			var X = __board_shift.x + move_square_position.x * __square_size;
+			var Y = __board_shift.y + move_square_position.y * __square_size;
 			draw_set_color(c_yellow);
 			draw_rectangle(X, Y, X + __square_size, Y + __square_size, true);
+			
+			if (available_turn.is_attack()) {
+				var under_attack_square_position/*:Square*/ = available_turn.get_square_under_attack().get_position();
+				var X = __board_shift.x + under_attack_square_position.x * __square_size;
+				var Y = __board_shift.y + under_attack_square_position.y * __square_size;
+				draw_set_color(c_red);
+				draw_cross(X + __square_size / 2, Y + __square_size / 2, __square_size / 2, 2, 45);
+			}
 		}
 	}
 	
