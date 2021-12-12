@@ -42,4 +42,8 @@ function Turn(_player/*:Player*/, _square_from/*:Square*/, _square_to/*:Square*/
 	static is_attack = function()/*->bool*/ {
 		return (__square_under_attack != undefined); 
 	}
+	
+	static toString = function()/*->string*/ {
+		return (string(__square_from) + "->" + string(__square_to) + "|" + (is_attack() ? "A" : "M"));
+	}
 }

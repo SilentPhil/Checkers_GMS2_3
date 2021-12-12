@@ -24,15 +24,15 @@ function BrainHuman(_player/*:Player*/, _render/*:Render*/) : Brain(_player) con
 			if (__selected_square != undefined) {
 				var turn/*:Turn*/ = __available_turns.find_turn(__selected_square, square_under_mouse);
 				if (turn != undefined) {
-					game.accept_turn(turn);
 					__end_turn();
+					game.accept_turn(turn);
 				}
 			}
 		}
 	}
 	
-	static begin_turn = function()/*->void*/ {
-		__available_turns = __player.get_game().get_board().get_available_turns(__player);
+	static begin_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
+		__available_turns = __player.get_game().get_board().get_available_turns(__player, _square_from);
 	}
 	
 	static __end_turn = function()/*->void*/ {

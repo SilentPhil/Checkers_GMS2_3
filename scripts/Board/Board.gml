@@ -55,9 +55,9 @@ function Board(_game/*:GameController*/) constructor {
 		_square.reset_piece();
 	}
 	
-	static get_available_turns = function(_player/*:Player*/)/*->TurnCollection*/ {
+	static get_available_turns = function(_player/*:Player*/, _square_from/*:Square*/ = undefined)/*->TurnCollection*/ {
 		var available_turns 		= new TurnCollection();
-		var array_of_pieces_squares = get_array_of_pieces_squares_for_player(_player);
+		var array_of_pieces_squares = (_square_from == undefined ? get_array_of_pieces_squares_for_player(_player) : [_square_from]);
 		
 		for (var i = 0, size_i = array_length(array_of_pieces_squares); i < size_i; i++) {
 			__fill_turns_collection_with_available_attack(available_turns, array_of_pieces_squares[i]);

@@ -15,6 +15,15 @@ function TurnCollection() constructor {
 		return false;
 	}
 	
+	static is_have_attack_turns = function()/*->bool*/ {
+		for (var i = 0, size_i = array_length(__array_of_turns); i < size_i; i++) {
+			if (__array_of_turns[i].is_attack()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	static is_empty = function()/*->bool*/ {
 		return array_is_empty(__array_of_turns);
 	}

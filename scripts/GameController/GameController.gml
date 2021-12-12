@@ -30,8 +30,12 @@ function GameController() constructor {
 		if (_turn.is_crowned_turn()) {
 			_turn.get_piece().set_king(true);
 		}
-		__change_current_player();
 		__turns_history.push_turn(_turn);
+		
+		var is_can_continue_attack = (_turn.is_attack() && __board.get_available_turns(__current_player, _turn.get_square_to()).is_have_attack_turns());
+		if (!is_can_continue_attack) {
+			__change_current_player();
+		}
 		__begin_turn();
 		
 		log(_turn.get_square_from().get_x_notation(), _turn.get_square_from().get_y_notation(), "->", _turn.get_square_to().get_x_notation(), _turn.get_square_to().get_y_notation());
