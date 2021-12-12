@@ -29,4 +29,12 @@ function Player(_game/*:GameController*/, _side/*:PLAYER_SIDE*/, _brain_type/*:P
 	static get_game = function()/*->GameController*/ {
 		return __game;
 	}
+	
+	static get_brain = function()/*->Brain*/ {
+		return __brain;
+	}
+	
+	static is_human = function()/*->bool*/ {
+		return (__brain_type == PLAYER_BRAIN.HUMAN);
+	}
 }

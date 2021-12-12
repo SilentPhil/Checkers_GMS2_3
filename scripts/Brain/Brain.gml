@@ -52,7 +52,7 @@ function BrainHuman(_player/*:Player*/, _render/*:Render*/) : Brain(_player) con
 }
 
 function BrainAI(_player/*:Player*/) : Brain(_player) constructor {
-	__turn_delay_timer = new Timer(20);
+	__turn_delay_timer = new Timer(35);
 	
 	/// @override
 	static step = function()/*->void*/ {

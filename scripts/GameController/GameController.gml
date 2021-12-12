@@ -12,10 +12,6 @@ function GameController() constructor {
 	
 	__begin_turn();
 	
-	static __begin_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
-		__current_player.begin_turn();
-	}
-	
 	static step = function()/*->void*/ {
 		__current_player.step();
 		
@@ -41,11 +37,12 @@ function GameController() constructor {
 		} else {
 			__begin_turn(_turn.get_square_from());
 		}
-		
 		// log(_turn.get_square_from().get_x_notation(), _turn.get_square_from().get_y_notation(), "->", _turn.get_square_to().get_x_notation(), _turn.get_square_to().get_y_notation());
-		/// @todo Нужно предусмотреть правило Турецкого удара https://ru.wikipedia.org/wiki/Турецкий_удар, когда буду делать ходы дамки
-		
 	}
+	
+	static __begin_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
+		__current_player.begin_turn();
+	}	
 	
 	static __undo_last_turn = function()/*->void*/ {
 		var last_turn/*:Turn*/ = __turns_history.get_last_turn();
@@ -83,6 +80,10 @@ function GameController() constructor {
 	static get_other_player_for = function(_player/*:Player*/)/*->Player*/ {
 		return (_player == __players[PLAYER_SIDE.TOP] ? __players[PLAYER_SIDE.BOTTOM] : __players[PLAYER_SIDE.TOP]);
 	}	
+	
+	static get_current_player = function()/*->Player*/ {
+		return __current_player;
+	}
 	
 	static get_render = function()/*->Render*/ {
 		return __render;

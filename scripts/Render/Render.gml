@@ -14,9 +14,18 @@ function Render(_game_controller/*:GameController*/) constructor {
 		/*#*/0x8D77F4
 	];
 	
+	static __get_square_top_left = function(__square/*:Square*/)/*->Point*/ {
+		var position = __square.get_position();
+		var X = __board_shift.x + position.x * __square_size;
+		var Y = __board_shift.y + position.y * __square_size;
+		
+		return new Point(X, Y);
+	}
+	
 	static draw = function()/*->void*/ {
 		var board = __game_controller.get_board();
 		
+		// Рамка вокруг цвета игрока, чей сейчас ход
 		draw_set_color(__piece_color[__game_controller.get_current_player_index()]);
 		draw_line_width(0, 0, room_width, 0, 30);
 		draw_line_width(room_width, 0, room_width, room_height, 30);
@@ -25,59 +34,68 @@ function Render(_game_controller/*:GameController*/) constructor {
 		
 		for (var i = 0; i < board.get_width(); i++) {
 			for (var j = 0; j < board.get_height(); j++) {
-				var square = board.get_square(i, j);
-				var X = __board_shift.x + i * __square_size;
-				var Y = __board_shift.y + j * __square_size;
-				
-				// Square
+				var square	= board.get_square(i, j);
+				var pos		= __get_square_top_left(square);
+
+				if ((i == 0) || (j == board.get_height() - 1)) {
+					draw_set_halign(fa_center);
+					draw_set_valign(fa_middle);
+					draw_set_color(c_ltgray);
+					if (i == 0) {
+						draw_text(pos.x - __square_size / 2, pos.y + __square_size / 2, square.get_y_notation());
+					}
+					if (j == board.get_height() - 1) {
+						draw_text(pos.x + __square_size / 2, pos.y + __square_size * 1.5, square.get_x_notation());
+					}
+				}
+
+				// Клетки
 				draw_set_color(__square_color[/*#cast*/ square.get_color()]);
-				draw_rectangle(X, Y, X + __square_size, Y + __square_size, false);
+				draw_rectangle(pos.x, pos.y, pos.x + __square_size, pos.y + __square_size, false);
 				
-				// Piece
+				// Шашки
 				if (square.is_has_piece()) {
 					var piece/*:Piece*/ = square.get_piece();
 					draw_set_color(__piece_color[/*#cast*/ piece.get_color()]);
-					draw_circle(X + __square_size / 2, Y + __square_size / 2, __piece_size, piece.is_king());
-					// draw_ellipse(X, Y, X + __square_size, Y + __square_size, piece.is_king());
+					draw_circle(pos.x + __square_size / 2, pos.y + __square_size / 2, __piece_size, piece.is_king());
 				}
 			}
 		}
 		
-		var current_player = __game_controller.__current_player;
-		var selected_square/*:Square*/ = (/*#cast*/ current_player.__brain /*#as BrainHuman*/).get_selected_square();
-		if (selected_square != undefined) {
-			var position = selected_square.get_position();
-			var X = __board_shift.x + position.x * __square_size;
-			var Y = __board_shift.y + position.y * __square_size;
-			draw_set_color(c_red);
-			draw_rectangle(X, Y, X + __square_size, Y + __square_size, true);
-		}
-		
-		var available_turns = (/*#cast*/ current_player.__brain /*#as BrainHuman*/).get_available_turns();
-		var array_of_available_turns = available_turns.get_array_of_turns();
-		for (var i = 0, size_i = array_length(array_of_available_turns); i < size_i; i++) {
-			var available_turn = array_of_available_turns[i];
-			if (available_turn.get_square_from() == selected_square) {
-				var move_square_position = available_turn.get_square_to().get_position();
-				var X = __board_shift.x + move_square_position.x * __square_size;
-				var Y = __board_shift.y + move_square_position.y * __square_size;
-				draw_set_color(c_yellow);
-				draw_rectangle(X, Y, X + __square_size, Y + __square_size, true);
-				
-				if (available_turn.is_attack()) {
-					var under_attack_square_position/*:Square*/ = available_turn.get_square_under_attack().get_position();
-					var X = __board_shift.x + under_attack_square_position.x * __square_size;
-					var Y = __board_shift.y + under_attack_square_position.y * __square_size;
-					draw_set_color(c_red);
-					draw_cross(X + __square_size / 2, Y + __square_size / 2, __square_size / 2, 2, 45);
+		var current_player = __game_controller.get_current_player();
+		if (current_player.is_human()) {
+			var brain/*:BrainHuman*/ = /*#cast*/ current_player.get_brain();
+			
+			// Выбранная шашка
+	 		var selected_square/*:Square*/ = brain.get_selected_square();
+			if (selected_square != undefined) {
+				var pos = __get_square_top_left(selected_square);
+				draw_set_color(c_red);
+				draw_rectangle(pos.x, pos.y, pos.x + __square_size, pos.y + __square_size, true);
+			}
+			
+			var available_turns = brain.get_available_turns();
+			var array_of_available_turns = available_turns.get_array_of_turns();
+			for (var i = 0, size_i = array_length(array_of_available_turns); i < size_i; i++) {
+				var available_turn = array_of_available_turns[i];
+				if (available_turn.get_square_from() == selected_square) {
+					// Куда можно походить выбранной шашкой
+					var pos = __get_square_top_left(available_turn.get_square_to());
+					draw_set_color(c_yellow);
+					draw_rectangle(pos.x, pos.y, pos.x + __square_size, pos.y + __square_size, true);
+					
+					// Кто будет срублен атакой выбранной шашкой
+					if (available_turn.is_attack()) {
+						var pos = __get_square_top_left(available_turn.get_square_under_attack());
+						draw_set_color(c_red);
+						draw_cross(pos.x + __square_size / 2, pos.y + __square_size / 2, __square_size / 2, 2, 45);
+					}
+				} else {
+					// Шашки, которые могут походить
+					var pos = __get_square_top_left(available_turn.get_square_from());
+					draw_set_color(c_green);
+					draw_rectangle(pos.x + 5, pos.y + 5, pos.x + __square_size - 5, pos.y + __square_size - 5, true);
 				}
-			} else {
-				var move_square_position = available_turn.get_square_from().get_position();
-				var X = __board_shift.x + move_square_position.x * __square_size;
-				var Y = __board_shift.y + move_square_position.y * __square_size;
-				draw_set_color(c_green);
-				draw_rectangle(X + 5, Y + 5, X + __square_size - 5, Y + __square_size - 5, true);
-				
 			}
 		}
 	}
