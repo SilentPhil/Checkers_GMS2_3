@@ -27,6 +27,9 @@ function GameController() constructor {
 		if (_turn.is_attack()) {
 			__board.delete_piece(_turn.get_square_under_attack());
 		}
+		if (_turn.is_crowned_turn()) {
+			_turn.get_piece().set_king(true);
+		}
 		__change_current_player();
 		__turns_history.push_turn(_turn);
 		__begin_turn();
@@ -42,6 +45,9 @@ function GameController() constructor {
 			__board.move_piece(last_turn.get_square_to(), last_turn.get_square_from());
 			if (last_turn.is_attack()) {
 				(last_turn.get_square_under_attack() /*#as Square*/).set_piece(last_turn.get_piece_under_attack());
+			}
+			if (last_turn.is_crowned_turn()) {
+				last_turn.get_piece().set_king(false);
 			}
 			__current_player = last_turn.get_player();
 			__turns_history.delete_last_turn();

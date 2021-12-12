@@ -9,6 +9,7 @@ function Turn(_player/*:Player*/, _square_from/*:Square*/, _square_to/*:Square*/
 	if (__square_under_attack != undefined) {
 		__piece_under_attack = __square_under_attack.get_piece();
 	}
+	__is_crowned_turn		= (!__piece.is_king() && __square_to.is_king_row(__player)); // Приведет ли этот ход к коронации пешки
 	
 	static get_player = function()/*->Player*/ {
 		return __player;
@@ -32,6 +33,10 @@ function Turn(_player/*:Player*/, _square_from/*:Square*/, _square_to/*:Square*/
 	
 	static get_piece_under_attack = function()/*->Piece?*/ {
 		return __piece_under_attack;
+	}
+	
+	static is_crowned_turn = function()/*->bool*/ {
+		return __is_crowned_turn;
 	}
 	
 	static is_attack = function()/*->bool*/ {

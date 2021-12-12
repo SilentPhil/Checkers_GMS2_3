@@ -1,10 +1,14 @@
 function Piece(_color/*:PIECE_COLOR*/, _player/*:Player*/) constructor {
 	__color 	= _color;	/// @is {PIECE_COLOR}
 	__player	= _player;	/// @is {Player}
-	__is_king	= true;
+	__is_king	= false;
 	
 	static is_king = function()/*->bool*/ {
 		return __is_king;
+	}
+	
+	static set_king = function(_is_king/*:bool*/)/*->void*/ {
+		__is_king = _is_king;
 	}
 	
 	static get_player = function()/*->Player*/ {

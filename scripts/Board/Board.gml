@@ -42,8 +42,13 @@ function Board(_game/*:GameController*/) constructor {
 	}
 	
 	static move_piece = function(_old_square/*:Square*/, _new_square/*:Square*/)/*->void*/ {
-		_new_square.set_piece(_old_square.get_piece());
+		var piece/*:Piece*/ = _old_square.get_piece();
 		_old_square.reset_piece();
+		_new_square.set_piece(piece);
+		
+		// if (_new_square.is_king_row(piece.get_player())) {
+		// 	piece.set_king(true);
+		// }
 	}
 	
 	static delete_piece = function(_square/*:Square*/)/*->void*/ {
@@ -67,22 +72,7 @@ function Board(_game/*:GameController*/) constructor {
 		return available_turns;
 	}
 	
-	static get_array_of_pieces_squares_for_player = function(_player/*:Player*/)/*->Square[]*/ {
-		/// @todo Каждый раз приходится пересчитывать шашки
-		var arr/*:Square[]*/ = [];
-			
-		for (var i = 0; i < __width; i++) {
-			for (var j = 0; j < __height; j++) {
-				var square = __squares[i][j];
-				if (square.is_has_piece(_player)) {
-					array_push(arr, square);
-				}
-			}
-		}
-		
-		return arr;
-	}
-	
+	/// @desc Заполняет переданную коллекцию ходов возможными ходами атак с указанной клетки
 	static __fill_turns_collection_with_available_attack = function(_turn_collection/*:TurnCollection*/, _square_attack_from/*:Square*/)/*->void*/ {
 		if (_square_attack_from.is_has_piece()) {
 			var piece/*:Piece*/ = _square_attack_from.get_piece();
@@ -132,6 +122,7 @@ function Board(_game/*:GameController*/) constructor {
 		}
 	}
 	
+	/// @desc Заполняет переданную коллекцию ходов возможными ходами движения с указанной клетки
 	static __fill_turns_collection_with_available_move = function(_turn_collection/*:TurnCollection*/, _square_move_from/*:Square*/)/*->void*/ {
 		if (_square_move_from.is_has_piece()) {
 			var piece/*:Piece*/ = _square_move_from.get_piece();
@@ -164,6 +155,21 @@ function Board(_game/*:GameController*/) constructor {
 			}
 		}
 	}
+	
+	static get_array_of_pieces_squares_for_player = function(_player/*:Player*/)/*->Square[]*/ {
+		/// @todo Каждый раз приходится пересчитывать шашки
+		var arr/*:Square[]*/ = [];
+			
+		for (var i = 0; i < __width; i++) {
+			for (var j = 0; j < __height; j++) {
+				var square = __squares[i][j];
+				if (square.is_has_piece(_player)) {
+					array_push(arr, square);
+				}
+			}
+		}
+		return arr;
+	}	
 	
 	static get_width = function()/*->number*/ {
 		return __width;

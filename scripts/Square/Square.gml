@@ -25,11 +25,11 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:SQUARE_
 	/// @desc Возвращает, является ли клетка для указанного игрока краем доски, на котором шашка становится королевой
 	static is_king_row = function(_player/*:Player*/)/*->bool*/ {
 		switch (_player.get_side()) {
-			case PLAYER_SIDE.TOP:
+			case PLAYER_SIDE.BOTTOM:
 				return (__position.y == 0);
 			break;
 			
-			case PLAYER_SIDE.BOTTOM:
+			case PLAYER_SIDE.TOP:
 				return (__position.y == (__board.get_height() - 1));
 			break;
 			
