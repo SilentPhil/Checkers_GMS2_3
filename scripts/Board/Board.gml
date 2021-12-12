@@ -58,43 +58,30 @@ function Board(_game/*:GameController*/) constructor {
 			var player		= piece.get_player();
 					
 			var available_attack_directions/*:array<DIRECTION>*/ = [DIRECTION.NW, DIRECTION.NE, DIRECTION.SW, DIRECTION.SE];
-			if (!piece.is_king()) {
-				for (var i = 0, size_i = array_length(available_attack_directions); i < size_i; i++) {
-					var attack_direction			= available_attack_directions[i];
-					var square_under_attack/*:Square*/	= _square_attack_from.get_neighbour(attack_direction);
-					if (square_under_attack != undefined && square_under_attack.is_has_piece(__game.get_other_player_for(player))) {
-						// В этом поле находится фишка врага, нужно посмотреть, можно ли ее перепрыгнуть в том же направлении
-						var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction);
-						if (square_attack_to != undefined) {
-							if (!square_attack_to.is_has_piece()) {
-								_turn_collection.push_turn(new Turn(player, _square_attack_from, square_attack_to, square_under_attack));
-							}
-						}
-					}
-				}
+			if (piece.is_king()) {
+				var attack_max_distance = max(get_width(), get_height());
 			} else {
-				for (var i = 0, size_i = array_length(available_attack_directions); i < size_i; i++) {
-					var attack_direction	= available_attack_directions[i];
-					var square_attack_from	= _square_attack_from;
-					while (square_attack_from != undefined) {
-						var square_under_attack/*:Square*/ = square_attack_from.get_neighbour(attack_direction);
-						if (square_under_attack != undefined) {
-							if (square_under_attack.is_has_piece(__game.get_other_player_for(player))) {
-								// В этом поле находится фишка врага, нужно посмотреть, можно ли ее перепрыгнуть в том же направлении
-								var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction);
-								while (square_attack_to != undefined) {
-									if (!square_attack_to.is_has_piece()) {
-										_turn_collection.push_turn(new Turn(player, _square_attack_from, square_attack_to, square_under_attack));
-									} else {
-										break;
-									}
-									square_attack_to = square_attack_to.get_neighbour(attack_direction);
-								}
-							} else if (square_under_attack.is_has_piece(player)) {
+				var attack_max_distance = 1;
+			}
+					
+			for (var i = 0, size_i = array_length(available_attack_directions); i < size_i; i++) {
+				var attack_direction = available_attack_directions[i];
+				for (var j = 1; j <= attack_max_distance; j++) {
+					var square_under_attack/*:Square*/	= _square_attack_from.get_neighbour(attack_direction, j);
+					// Найдена клетка с шашкой врага
+					if (square_under_attack != undefined && square_under_attack.is_has_piece(__game.get_other_player_for(player))) {
+						// Ищим свободные клетки за шашкой врага
+						for (var k = 1; k <= attack_max_distance; k++) {
+							var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction, k);
+							if (square_attack_to != undefined && !square_attack_to.is_has_piece()) {
+								_turn_collection.push_turn(new Turn(player, _square_attack_from, square_attack_to, square_under_attack));
+							} else {
+								// Если достигли конца доски или встретили хоть одну шашку, то дальше свободные клетки не ищим
 								break;
 							}
 						}
-						square_attack_from = square_under_attack;
+						// Т.к. шашку врага уже нашли - в этом направлении дальше искать врагов смысла нет
+						break;
 					}
 				}
 			}
@@ -107,28 +94,22 @@ function Board(_game/*:GameController*/) constructor {
 			var piece/*:Piece*/ = _square_move_from.get_piece();
 			var player		= piece.get_player();
 			
-			if (!piece.is_king()) {
+			if (piece.is_king()) {
+				var available_movement_directions/*:array<DIRECTION>*/ = [DIRECTION.NW, DIRECTION.NE, DIRECTION.SW, DIRECTION.SE];
+				var move_max_distance = max(get_width(), get_height());
+			} else {
 				var available_movement_directions/*:array<DIRECTION>*/ = piece.get_available_movement_directions();
-				for (var i = 0, size_i = array_length(available_movement_directions); i < size_i; i++) {
-					var movement_direction		= available_movement_directions[i];
-					var square_move_to/*:Square*/	= _square_move_from.get_neighbour(movement_direction);
+				var move_max_distance = 1;
+			}
+			
+			for (var i = 0, size_i = array_length(available_movement_directions); i < size_i; i++) {
+				var movement_direction	= available_movement_directions[i];
+				for (var j = 1; j <= move_max_distance; j++) {
+					var square_move_to/*:Square*/ = _square_move_from.get_neighbour(movement_direction, j);
 					if (square_move_to != undefined && !square_move_to.is_has_piece()) {
 						_turn_collection.push_turn(new Turn(player, _square_move_from, square_move_to));
-					}
-				}
-			} else {
-				var available_movement_directions/*:array<DIRECTION>*/ = [DIRECTION.NW, DIRECTION.NE, DIRECTION.SW, DIRECTION.SE];
-				for (var i = 0, size_i = array_length(available_movement_directions); i < size_i; i++) {
-					var movement_direction	= available_movement_directions[i];
-					var square_move_from	= _square_move_from;
-					while (square_move_from != undefined) {
-						var square_move_to/*:Square*/	= square_move_from.get_neighbour(movement_direction);
-						if (square_move_to != undefined && !square_move_to.is_has_piece()) {
-							_turn_collection.push_turn(new Turn(player, _square_move_from, square_move_to));
-						} else {
-							break;
-						}
-						square_move_from = square_move_to;
+					} else {
+						break;
 					}
 				}
 			}

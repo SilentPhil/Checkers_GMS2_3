@@ -25,6 +25,31 @@ function GameController() constructor {
 				if (keyboard_check_pressed(ord("R"))) {
 					__restart();
 				}
+				
+				#region debug - Добавление и удаление шашек
+				if (keyboard_check_pressed(ord("Z"))) {
+					var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
+					if (square_under_mouse != undefined && square_under_mouse.is_black()) {
+						square_under_mouse.set_piece(new Piece(PIECE_COLOR.BLACK, __players[PLAYER_SIDE.TOP]));
+						__begin_new_turn();
+					}
+				}
+				if (keyboard_check_pressed(ord("X"))) {
+					var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
+					if (square_under_mouse != undefined && square_under_mouse.is_black()) {
+						square_under_mouse.set_piece(new Piece(PIECE_COLOR.WHITE, __players[PLAYER_SIDE.BOTTOM]));
+						__begin_new_turn();
+					}
+				}				
+				if (keyboard_check_pressed(ord("C"))) {
+					var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
+					if (square_under_mouse != undefined && square_under_mouse.is_black()) {
+						square_under_mouse.reset_piece();
+						__begin_new_turn();
+					}
+				}
+				#endregion
+				
 			break;
 			
 			case GAME_STATE.END:

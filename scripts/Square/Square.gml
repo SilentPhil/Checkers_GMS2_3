@@ -57,8 +57,24 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:SQUARE_
 		return __position;
 	}
 	
-	static get_neighbour = function(_side/*:DIRECTION*/)/*->Square?*/ {
-		return __neighbours[/*#cast*/ _side];
+	/// @desc Возвращает соседнюю черную клетку в указанном направлении. Дистанция определяет, какой сосед будет браться - ближайший (если 1) или последующе (если > 1)
+	static get_neighbour = function(_side/*:DIRECTION*/, _distance/*:number*/ = 1)/*->Square?*/ {
+		if (_distance == 1) {
+			return __neighbours[/*#cast*/ _side];
+		} else {
+			var neighbour/*:Square*/ = __neighbours[/*#cast*/ _side];
+			if (neighbour != undefined) {
+				repeat (_distance - 1) {
+					neighbour = neighbour.get_neighbour(_side);
+					if (neighbour == undefined) {
+						return undefined;
+					}
+				}
+				return neighbour;
+			} else {
+				return undefined;
+			}
+		}
 	}
 	
 	static get_x_notation = function()/*->string*/ {
