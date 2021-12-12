@@ -11,9 +11,11 @@ function Brain(_player/*:Player*/) constructor {
 		__available_turns = __player.get_game().get_board().get_available_turns(__player, _square_from);
 	}
 	
-	static __end_turn = function()/*->void*/ {
+	static __make_turn = function(_turn/*:Turn*/)/*->void*/ {
 		__selected_square = undefined;
 		__available_turns = new TurnCollection();
+		
+		__player.get_game().accept_turn(_turn);		
 	}	
 	
 	static get_selected_square = function()/*->Square?*/ {
@@ -42,8 +44,7 @@ function BrainHuman(_player/*:Player*/, _render/*:Render*/) : Brain(_player) con
 			if (__selected_square != undefined) {
 				var turn/*:Turn*/ = __available_turns.find_turn(__selected_square, square_under_mouse);
 				if (turn != undefined) {
-					__end_turn();
-					game.accept_turn(turn);
+					__make_turn(turn);
 				}
 			}
 		}
@@ -51,12 +52,18 @@ function BrainHuman(_player/*:Player*/, _render/*:Render*/) : Brain(_player) con
 }
 
 function BrainAI(_player/*:Player*/) : Brain(_player) constructor {
+	__turn_delay_timer = new Timer(20);
+	
 	/// @override
 	static step = function()/*->void*/ {
-		var turn/*:Turn*/ = __available_turns.get_random();
-		if (turn != undefined) {
-			__end_turn();
-			__player.get_game().accept_turn(turn);
+		// Самый простейший "ИИ" - выбирает случайный доступный ход 
+		if (__turn_delay_timer.is_done()) {
+			__turn_delay_timer.reset();
+			
+			var turn/*:Turn*/ = __available_turns.get_random();
+			if (turn != undefined) {
+				__make_turn(turn);
+			}
 		}
 	}
 }

@@ -1,8 +1,10 @@
 function GameController() constructor {
-	__players	= [	/// @is {Player[]}
-					new Player(self, PLAYER_SIDE.TOP,		PLAYER_BRAIN.HUMAN), 
-					new Player(self, PLAYER_SIDE.BOTTOM,	PLAYER_BRAIN.AI)
-				];
+	__render			= new Render(self);
+	
+	__players			= [	/// @is {Player[]}
+							new Player(self, PLAYER_SIDE.TOP,		PLAYER_BRAIN.AI), 
+							new Player(self, PLAYER_SIDE.BOTTOM,	PLAYER_BRAIN.HUMAN)
+						];
 	__current_player	= __players[PLAYER_SIDE.BOTTOM]; /// @is {Player}
 
 	__board 			= new Board(self);
@@ -10,7 +12,7 @@ function GameController() constructor {
 	
 	__begin_turn();
 	
-	static __begin_turn = function()/*->void*/ {
+	static __begin_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
 		__current_player.begin_turn();
 	}
 	
@@ -35,10 +37,12 @@ function GameController() constructor {
 		var is_can_continue_attack = (_turn.is_attack() && __board.get_available_turns(__current_player, _turn.get_square_to()).is_have_attack_turns());
 		if (!is_can_continue_attack) {
 			__change_current_player();
+			__begin_turn();
+		} else {
+			__begin_turn(_turn.get_square_from());
 		}
-		__begin_turn();
 		
-		log(_turn.get_square_from().get_x_notation(), _turn.get_square_from().get_y_notation(), "->", _turn.get_square_to().get_x_notation(), _turn.get_square_to().get_y_notation());
+		// log(_turn.get_square_from().get_x_notation(), _turn.get_square_from().get_y_notation(), "->", _turn.get_square_to().get_x_notation(), _turn.get_square_to().get_y_notation());
 		/// @todo Нужно предусмотреть правило Турецкого удара https://ru.wikipedia.org/wiki/Турецкий_удар, когда буду делать ходы дамки
 		
 	}
@@ -55,6 +59,7 @@ function GameController() constructor {
 			}
 			__current_player = last_turn.get_player();
 			__turns_history.delete_last_turn();
+			
 			__begin_turn();
 		}
 	}
@@ -78,4 +83,8 @@ function GameController() constructor {
 	static get_other_player_for = function(_player/*:Player*/)/*->Player*/ {
 		return (_player == __players[PLAYER_SIDE.TOP] ? __players[PLAYER_SIDE.BOTTOM] : __players[PLAYER_SIDE.TOP]);
 	}	
+	
+	static get_render = function()/*->Render*/ {
+		return __render;
+	}
 }

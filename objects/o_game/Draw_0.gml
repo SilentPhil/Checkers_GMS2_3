@@ -1,2 +1,2 @@
 
-render.draw();
+game.get_render().draw();

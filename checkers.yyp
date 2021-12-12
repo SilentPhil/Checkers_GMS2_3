@@ -15,6 +15,7 @@
     {"id":{"name":"Square","path":"scripts/Square/Square.yy",},"order":2,},
     {"id":{"name":"TurnCollection","path":"scripts/TurnCollection/TurnCollection.yy",},"order":3,},
     {"id":{"name":"TurnHistory","path":"scripts/TurnHistory/TurnHistory.yy",},"order":4,},
+    {"id":{"name":"Timer","path":"scripts/Timer/Timer.yy",},"order":2,},
   ],
   "Options": [
     {"name":"Amazon Fire","path":"options/amazonfire/options_amazonfire.yy",},
