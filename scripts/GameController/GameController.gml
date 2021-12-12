@@ -9,14 +9,29 @@ function GameController() constructor {
 
 	__board 			= new Board(self);
 	__turns_history		= new TurnHistory();
+	__game_state		= GAME_STATE.PLAY;
+	__game_winner		= undefined; /// @is {Player?}
 	
 	__begin_new_turn();
 	
 	static step = function()/*->void*/ {
-		__current_player.step();
-		
-		if (keyboard_check_pressed(vk_space)) {
-			__undo_last_turn();
+		switch (__game_state) {
+			case GAME_STATE.PLAY:
+				__current_player.step();
+				
+				if (keyboard_check_pressed(vk_space)) {
+					__undo_last_turn();
+				}
+				if (keyboard_check_pressed(ord("R"))) {
+					__restart();
+				}
+			break;
+			
+			case GAME_STATE.END:
+				if (keyboard_check_pressed(vk_anykey)) {
+					__restart();
+				}
+			break;
 		}
 	}
 	
@@ -37,10 +52,8 @@ function GameController() constructor {
 			__change_current_player();
 			__begin_new_turn();
 		}
-	}
-	
-	static __begin_new_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
-		__current_player.begin_turn();
+		
+		__check_game_end();
 	}	
 	
 	static __undo_last_turn = function()/*->void*/ {
@@ -58,7 +71,43 @@ function GameController() constructor {
 			
 			__begin_new_turn();
 		}
+	}	
+	
+	static __restart = function()/*->void*/ {
+		__board	= new Board(self);
+		__turns_history.clear();
+		__game_state		= GAME_STATE.PLAY;
+		__current_player	= __players[PLAYER_SIDE.BOTTOM];
+		__begin_new_turn();
 	}
+	
+	static __check_game_end = function()/*->void*/ {
+		var player_top		= __players[PLAYER_SIDE.TOP];
+		var player_bottom	= __players[PLAYER_SIDE.BOTTOM];
+		
+		var is_no_pieces_player_top = array_is_empty(__board.get_array_of_pieces_squares_for_player(player_top));
+		var is_no_turns_player_top	= __board.get_available_turns(player_top).is_empty();
+		if (is_no_pieces_player_top || is_no_turns_player_top) {
+			__game_end(player_bottom);
+			return;
+		}	
+		var is_no_pieces_player_bottom	= array_is_empty(__board.get_array_of_pieces_squares_for_player(player_bottom));
+		var is_no_turns_player_bottom	= __board.get_available_turns(player_bottom).is_empty();
+		if (is_no_pieces_player_bottom || is_no_turns_player_bottom) {
+			__game_end(player_top);
+			return;
+		}
+		// Сюда еще можно добавить остальные варианты завершения игры, будь то ходьба дамкой > 15 ходов подряд и т.д. См. википедию.
+	}
+	
+	static __game_end = function(_winner/*:Player?*/)/*->void*/ {
+		__game_state	= GAME_STATE.END;
+		__game_winner	= _winner;
+	}
+	
+	static __begin_new_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
+		__current_player.begin_turn();
+	}	
 	
 	static __change_current_player = function()/*->void*/ {
 		__current_player = get_other_player_for(__current_player);
@@ -72,11 +121,7 @@ function GameController() constructor {
 	static get_players = function()/*->Player[]*/ {
 		return __players;
 	}
-	
-	static get_current_player_index = function()/*->number*/ {
-		return array_find_index(__players, __current_player);
-	}
-	
+
 	static get_other_player_for = function(_player/*:Player*/)/*->Player*/ {
 		return (_player == __players[PLAYER_SIDE.TOP] ? __players[PLAYER_SIDE.BOTTOM] : __players[PLAYER_SIDE.TOP]);
 	}	
@@ -85,8 +130,25 @@ function GameController() constructor {
 		return __current_player;
 	}
 	
+	static get_player_index = function(_player/*:Player*/)/*->number*/ {
+		return array_find_index(__players, _player);
+	}
+	
 	static get_render = function()/*->Render*/ {
 		return __render;
 	}
+	
+	static get_winner = function()/*->Player?*/ {
+		return __game_winner;
+	}
+	
+	static get_game_state = function()/*->GAME_STATE*/ {
+		return __game_state;
+	}
 	#endregion
+}
+
+enum GAME_STATE {
+	PLAY,
+	END
 }

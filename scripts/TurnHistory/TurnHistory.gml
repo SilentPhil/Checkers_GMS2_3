@@ -10,6 +10,10 @@ function TurnHistory() constructor {
 			array_delete(__array_of_turns, array_length(__array_of_turns) - 1, 1);
 		}
 	}
+	
+	static clear = function()/*->void*/ {
+		__array_of_turns = [];
+	}
 
 	#region getters
 	static get_last_turn = function()/*->Turn?*/ {

@@ -16,15 +16,23 @@ function Render(_game_controller/*:GameController*/) constructor {
 	];
 	
 	static draw = function()/*->void*/ {
+		switch (__game_controller.get_game_state()) {
+			case GAME_STATE.PLAY:
+				__draw_gameplay();
+			break;
+			
+			case GAME_STATE.END:
+				__draw_game_end();
+			break;
+		}
+	}
+	
+	static __draw_gameplay = function()/*->void*/ {
 		var board = __game_controller.get_board();
+		var current_player = __game_controller.get_current_player();
 		
 		// Рамка вокруг цвета игрока, чей сейчас ход
-		var border_size = 30;
-		draw_set_color(__piece_color[__game_controller.get_current_player_index()]);
-		draw_line_width(0,				0,				__game_field.x, 0,				border_size);
-		draw_line_width(__game_field.x, 0,				__game_field.x, __game_field.y,	border_size);
-		draw_line_width(__game_field.x, __game_field.y, 0,				__game_field.y,	border_size);
-		draw_line_width(0,				__game_field.y, 0,				0,				border_size);
+		__draw_border(__piece_color[__game_controller.get_player_index(current_player)], 30);
 		
 		for (var i = 0; i < board.get_width(); i++) {
 			for (var j = 0; j < board.get_height(); j++) {
@@ -59,7 +67,6 @@ function Render(_game_controller/*:GameController*/) constructor {
 			}
 		}
 		
-		var current_player = __game_controller.get_current_player();
 		if (current_player.is_human()) {
 			var brain/*:BrainHuman*/ = /*#cast*/ current_player.get_brain();
 			
@@ -96,6 +103,33 @@ function Render(_game_controller/*:GameController*/) constructor {
 			}
 		}
 	}
+	
+	static __draw_game_end = function()/*->void*/ {
+		var winner/*:Player*/ = __game_controller.get_winner();
+		if (winner != undefined) {
+			var player_index = __game_controller.get_player_index(winner);
+			var player_color = __piece_color[player_index];
+			__draw_border(player_color, 150);
+			
+			draw_set_color(player_color);
+			draw_set_halign(fa_center);
+			draw_set_valign(fa_middle);
+			draw_text(__game_field.x / 2, __game_field.y / 2, 
+					"Player " + string(player_index + 1) + " won!\n\n" +
+					"Press any key to new game..."
+				);
+			
+		}
+	}
+	
+	
+	static __draw_border = function(_color/*:number*/, _width/*:number*/)/*->void*/ {
+		draw_set_color(_color);
+		draw_line_width(0,				0,				__game_field.x, 0,				_width);
+		draw_line_width(__game_field.x, 0,				__game_field.x, __game_field.y,	_width);
+		draw_line_width(__game_field.x, __game_field.y, 0,				__game_field.y,	_width);
+		draw_line_width(0,				__game_field.y, 0,				0,				_width);
+	}	
 	
 	#region getters
 	static __get_square_top_left = function(__square/*:Square*/)/*->Point*/ {
