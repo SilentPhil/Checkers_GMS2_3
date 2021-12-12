@@ -17,7 +17,7 @@ function Board(_game/*:GameController*/) constructor {
 	for (var i = 0; i < __width; i++) {
 		for (var j = 0; j < __height; j++) {
 			var square = __squares[i][j];
-			if (square.get_color() == SQUARE_COLOR.BLACK) {
+			if (square.is_black()) {
 				square.__neighbours[@ DIRECTION.NW] = array_get_2d_safe(__squares, i - 1, j - 1);
 				square.__neighbours[@ DIRECTION.NE] = array_get_2d_safe(__squares, i + 1, j - 1);
 				square.__neighbours[@ DIRECTION.SE] = array_get_2d_safe(__squares, i + 1, j + 1);
@@ -83,44 +83,82 @@ function Board(_game/*:GameController*/) constructor {
 		return arr;
 	}
 	
-	static __fill_turns_collection_with_available_attack = function(_turn_collection/*:TurnCollection*/, _square/*:Square*/)/*->void*/ {
-		if (_square.is_has_piece()) {
-			var piece/*:Piece*/ = _square.get_piece();
+	static __fill_turns_collection_with_available_attack = function(_turn_collection/*:TurnCollection*/, _square_attack_from/*:Square*/)/*->void*/ {
+		if (_square_attack_from.is_has_piece()) {
+			var piece/*:Piece*/ = _square_attack_from.get_piece();
 			var player		= piece.get_player();
 					
 			var available_attack_directions/*:array<DIRECTION>*/ = [DIRECTION.NW, DIRECTION.NE, DIRECTION.SW, DIRECTION.SE];
-			
-			for (var i = 0, size_i = array_length(available_attack_directions); i < size_i; i++) {
-				var attack_direction		= available_attack_directions[i];
-				var neigbour_square/*:Square*/	= _square.get_neighbour(attack_direction);
-				if (neigbour_square != undefined) {
-					if (neigbour_square.is_has_piece(__game.get_other_player_for(player))) {
+			if (!piece.is_king()) {
+				for (var i = 0, size_i = array_length(available_attack_directions); i < size_i; i++) {
+					var attack_direction			= available_attack_directions[i];
+					var square_under_attack/*:Square*/	= _square_attack_from.get_neighbour(attack_direction);
+					if (square_under_attack != undefined && square_under_attack.is_has_piece(__game.get_other_player_for(player))) {
 						// В этом поле находится фишка врага, нужно посмотреть, можно ли ее перепрыгнуть в том же направлении
-						var attack_neighbour_square/*:Square*/ = neigbour_square.get_neighbour(attack_direction);
-						if (attack_neighbour_square != undefined) {
-							if (!attack_neighbour_square.is_has_piece()) {
-								_turn_collection.push_turn(new Turn(player, _square, attack_neighbour_square, neigbour_square));
+						var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction);
+						if (square_attack_to != undefined) {
+							if (!square_attack_to.is_has_piece()) {
+								_turn_collection.push_turn(new Turn(player, _square_attack_from, square_attack_to, square_under_attack));
 							}
 						}
+					}
+				}
+			} else {
+				for (var i = 0, size_i = array_length(available_attack_directions); i < size_i; i++) {
+					var attack_direction	= available_attack_directions[i];
+					var square_attack_from	= _square_attack_from;
+					while (square_attack_from != undefined) {
+						var square_under_attack/*:Square*/ = square_attack_from.get_neighbour(attack_direction);
+						if (square_under_attack != undefined) {
+							if (square_under_attack.is_has_piece(__game.get_other_player_for(player))) {
+								// В этом поле находится фишка врага, нужно посмотреть, можно ли ее перепрыгнуть в том же направлении
+								var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction);
+								while (square_attack_to != undefined) {
+									if (!square_attack_to.is_has_piece()) {
+										_turn_collection.push_turn(new Turn(player, _square_attack_from, square_attack_to, square_under_attack));
+									} else {
+										break;
+									}
+									square_attack_to = square_attack_to.get_neighbour(attack_direction);
+								}
+							} else if (square_under_attack.is_has_piece(player)) {
+								break;
+							}
+						}
+						square_attack_from = square_under_attack;
 					}
 				}
 			}
 		}
 	}
 	
-	static __fill_turns_collection_with_available_move = function(_turn_collection/*:TurnCollection*/, _square/*:Square*/)/*->void*/ {
-		if (_square.is_has_piece()) {
-			var piece/*:Piece*/ = _square.get_piece();
+	static __fill_turns_collection_with_available_move = function(_turn_collection/*:TurnCollection*/, _square_move_from/*:Square*/)/*->void*/ {
+		if (_square_move_from.is_has_piece()) {
+			var piece/*:Piece*/ = _square_move_from.get_piece();
 			var player		= piece.get_player();
 			
-			var available_movement_directions/*:array<DIRECTION>*/ = piece.get_available_movement_directions();
-				
-			for (var i = 0, size_i = array_length(available_movement_directions); i < size_i; i++) {
-				var movement_direction		= available_movement_directions[i];
-				var neigbour_square/*:Square*/	= _square.get_neighbour(movement_direction);
-				if (neigbour_square != undefined) {
-					if (!neigbour_square.is_has_piece()) {
-						_turn_collection.push_turn(new Turn(player, _square, neigbour_square));
+			if (!piece.is_king()) {
+				var available_movement_directions/*:array<DIRECTION>*/ = piece.get_available_movement_directions();
+				for (var i = 0, size_i = array_length(available_movement_directions); i < size_i; i++) {
+					var movement_direction		= available_movement_directions[i];
+					var square_move_to/*:Square*/	= _square_move_from.get_neighbour(movement_direction);
+					if (square_move_to != undefined && !square_move_to.is_has_piece()) {
+						_turn_collection.push_turn(new Turn(player, _square_move_from, square_move_to));
+					}
+				}
+			} else {
+				var available_movement_directions/*:array<DIRECTION>*/ = [DIRECTION.NW, DIRECTION.NE, DIRECTION.SW, DIRECTION.SE];
+				for (var i = 0, size_i = array_length(available_movement_directions); i < size_i; i++) {
+					var movement_direction	= available_movement_directions[i];
+					var square_move_from	= _square_move_from;
+					while (square_move_from != undefined) {
+						var square_move_to/*:Square*/	= square_move_from.get_neighbour(movement_direction);
+						if (square_move_to != undefined && !square_move_to.is_has_piece()) {
+							_turn_collection.push_turn(new Turn(player, _square_move_from, square_move_to));
+						} else {
+							break;
+						}
+						square_move_from = square_move_to;
 					}
 				}
 			}

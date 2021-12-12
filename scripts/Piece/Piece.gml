@@ -1,7 +1,7 @@
 function Piece(_color/*:PIECE_COLOR*/, _player/*:Player*/) constructor {
 	__color 	= _color;	/// @is {PIECE_COLOR}
 	__player	= _player;	/// @is {Player}
-	__is_king	= false;
+	__is_king	= true;
 	
 	static is_king = function()/*->bool*/ {
 		return __is_king;

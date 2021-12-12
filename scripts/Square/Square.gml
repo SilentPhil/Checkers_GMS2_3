@@ -13,12 +13,30 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:SQUARE_
 		__piece = undefined;
 	}
 	
+	#region getters
 	static is_black = function()/*->bool*/ {
 		return (__color == SQUARE_COLOR.BLACK);
 	}
 	
 	static get_color = function()/*->SQUARE_COLOR*/ {
 		return __color;
+	}
+	
+	/// @desc Возвращает, является ли клетка для указанного игрока краем доски, на котором шашка становится королевой
+	static is_king_row = function(_player/*:Player*/)/*->bool*/ {
+		switch (_player.get_side()) {
+			case PLAYER_SIDE.TOP:
+				return (__position.y == 0);
+			break;
+			
+			case PLAYER_SIDE.BOTTOM:
+				return (__position.y == (__board.get_height() - 1));
+			break;
+			
+			default:
+				return false;
+			break;
+		}
 	}
 	
 	static is_has_piece = function(_player/*:Player*/ = undefined)/*->bool*/ {
@@ -50,4 +68,9 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:SQUARE_
 	static get_y_notation = function()/*->string*/ {
 		return string(__board.get_height() - __position.y);
 	}
+	
+	static toString = function()/*->string*/ {
+		return string(__position);
+	}
+	#endregion
 }
