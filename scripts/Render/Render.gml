@@ -2,6 +2,7 @@ function Render(_game_controller/*:GameController*/) constructor {
 	__game_controller = _game_controller; /// @is {GameController}
 	
 	__board_shift	= new Point(128, 128);
+	__game_field	= new Point(640, 640);
 	__square_size	= 48;
 	__piece_size	= (__square_size * 0.8) / 2;
 	
@@ -14,37 +15,33 @@ function Render(_game_controller/*:GameController*/) constructor {
 		/*#*/0x8D77F4
 	];
 	
-	static __get_square_top_left = function(__square/*:Square*/)/*->Point*/ {
-		var position = __square.get_position();
-		var X = __board_shift.x + position.x * __square_size;
-		var Y = __board_shift.y + position.y * __square_size;
-		
-		return new Point(X, Y);
-	}
-	
 	static draw = function()/*->void*/ {
 		var board = __game_controller.get_board();
 		
 		// Рамка вокруг цвета игрока, чей сейчас ход
+		var border_size = 30;
 		draw_set_color(__piece_color[__game_controller.get_current_player_index()]);
-		draw_line_width(0, 0, room_width, 0, 30);
-		draw_line_width(room_width, 0, room_width, room_height, 30);
-		draw_line_width(room_width, room_height, 0, room_height, 30);
-		draw_line_width(0, room_height, 0, 0, 30);
+		draw_line_width(0,				0,				__game_field.x, 0,				border_size);
+		draw_line_width(__game_field.x, 0,				__game_field.x, __game_field.y,	border_size);
+		draw_line_width(__game_field.x, __game_field.y, 0,				__game_field.y,	border_size);
+		draw_line_width(0,				__game_field.y, 0,				0,				border_size);
 		
 		for (var i = 0; i < board.get_width(); i++) {
 			for (var j = 0; j < board.get_height(); j++) {
 				var square	= board.get_square(i, j);
 				var pos		= __get_square_top_left(square);
 
-				if ((i == 0) || (j == board.get_height() - 1)) {
+				// Подписи к клеткам (1, 2, 3,.., a, b, c,..)
+				var is_first_column = (i == 0);
+				var is_last_row 	= (j == board.get_height() - 1);
+				if (is_first_column || is_last_row) {
 					draw_set_halign(fa_center);
 					draw_set_valign(fa_middle);
 					draw_set_color(c_ltgray);
-					if (i == 0) {
+					if (is_first_column) {
 						draw_text(pos.x - __square_size / 2, pos.y + __square_size / 2, square.get_y_notation());
 					}
-					if (j == board.get_height() - 1) {
+					if (is_last_row) {
 						draw_text(pos.x + __square_size / 2, pos.y + __square_size * 1.5, square.get_x_notation());
 					}
 				}
@@ -100,6 +97,15 @@ function Render(_game_controller/*:GameController*/) constructor {
 		}
 	}
 	
+	#region getters
+	static __get_square_top_left = function(__square/*:Square*/)/*->Point*/ {
+		var position = __square.get_position();
+		var X = __board_shift.x + position.x * __square_size;
+		var Y = __board_shift.y + position.y * __square_size;
+		
+		return new Point(X, Y);
+	}	
+	
 	static get_square_in_point = function(_x/*:number*/, _y/*:number*/)/*->Square?*/ {
 		var board = __game_controller.get_board();
 		var X = ceil((_x - __board_shift.x) / __square_size) - 1;
@@ -111,4 +117,5 @@ function Render(_game_controller/*:GameController*/) constructor {
 			return undefined;
 		}
 	}
+	#endregion
 }

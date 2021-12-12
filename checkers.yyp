@@ -2,7 +2,7 @@
   "resources": [
     {"id":{"name":"o_game","path":"objects/o_game/o_game.yy",},"order":0,},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},"order":0,},
-    {"id":{"name":"blueprint","path":"scripts/blueprint/blueprint.yy",},"order":1,},
+    {"id":{"name":"gml_scripts","path":"scripts/gml_scripts/gml_scripts.yy",},"order":1,},
     {"id":{"name":"Render","path":"scripts/Render/Render.yy",},"order":2,},
     {"id":{"name":"Board","path":"scripts/Board/Board.yy",},"order":0,},
     {"id":{"name":"GameController","path":"scripts/GameController/GameController.yy",},"order":0,},

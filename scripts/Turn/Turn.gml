@@ -11,6 +11,7 @@ function Turn(_player/*:Player*/, _square_from/*:Square*/, _square_to/*:Square*/
 	}
 	__is_crowned_turn		= (!__piece.is_king() && __square_to.is_king_row(__player)); // Приведет ли этот ход к коронации пешки
 	
+	#region getters
 	static get_player = function()/*->Player*/ {
 		return __player;
 	}
@@ -46,4 +47,5 @@ function Turn(_player/*:Player*/, _square_from/*:Square*/, _square_to/*:Square*/
 	static toString = function()/*->string*/ {
 		return (string(__square_from) + "->" + string(__square_to) + "|" + (is_attack() ? "A" : "M"));
 	}
+	#endregion
 }

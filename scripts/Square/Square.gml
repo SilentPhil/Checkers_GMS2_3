@@ -74,3 +74,8 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:SQUARE_
 	}
 	#endregion
 }
+
+enum SQUARE_COLOR {
+	BLACK,
+	WHITE
+}

@@ -265,3 +265,21 @@ function array_swap_elements(_arr, _index_1, _index_2) {
 	_arr[@ _index_1] = _arr[_index_2];
 	_arr[@ _index_2] = tmp;
 }
+
+/// @template T
+function array_get_safe(_array/*:array<T>*/, _index/*:number*/)/*->T?*/ {
+	if (_index >= 0 && _index < (array_length(_array) - 1)) {
+		return _array[_index];
+	} else {
+		return undefined;
+	}
+}
+
+/// @template T
+function array_get_2d_safe(_array/*:T[][]*/, _i/*:number*/, _j/*:number*/)/*->T?*/ {
+	if ((_i >= 0 && _i < array_length(_array)) && (_j >= 0 && _j < array_length(_array[_i]))) {
+		return _array[_i][_j];
+	} else {
+		return undefined;
+	}
+}

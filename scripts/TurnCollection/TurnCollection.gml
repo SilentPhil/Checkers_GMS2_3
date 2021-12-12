@@ -1,11 +1,12 @@
 function TurnCollection() constructor {
 	/// @todo Можно инкапсулировать пуш нового хода, создавая объект класса внутри push_turn
-	__array_of_turns = [];			/// @is {Turn[]}
+	__array_of_turns = []; /// @is {Turn[]}
 	
 	static push_turn = function(_turn/*:Turn*/)/*->void*/ {
 		array_push(__array_of_turns, _turn);
 	}
 	
+	#region getters
 	static is_turn_exists = function(_square_to/*:Square*/)/*->bool*/ {
 		for (var i = 0, size_i = array_length(__array_of_turns); i < size_i; i++) {
 			if (__array_of_turns[i].get_square_to() == _square_to) {
@@ -45,4 +46,5 @@ function TurnCollection() constructor {
 	static get_random = function()/*->Turn?*/ {
 		return array_get_random(__array_of_turns);
 	}
+	#endregion
 }

@@ -22,6 +22,7 @@ function Player(_game/*:GameController*/, _side/*:PLAYER_SIDE*/, _brain_type/*:P
 		__brain.step();
 	}
 	
+	#region getters
 	static get_side = function()/*->PLAYER_SIDE*/ {
 		return __side;
 	}
@@ -37,4 +38,15 @@ function Player(_game/*:GameController*/, _side/*:PLAYER_SIDE*/, _brain_type/*:P
 	static is_human = function()/*->bool*/ {
 		return (__brain_type == PLAYER_BRAIN.HUMAN);
 	}
+	#endregion
+}
+
+enum PLAYER_SIDE {
+	TOP		= 0,
+	BOTTOM	= 1
+}
+
+enum PLAYER_BRAIN {
+	HUMAN,
+	AI
 }

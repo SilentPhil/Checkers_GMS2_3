@@ -6,7 +6,7 @@
     "path": "folders/Scripts/Etc.yy",
   },
   "resourceVersion": "1.0",
-  "name": "blueprint",
+  "name": "gml_scripts",
   "tags": [],
   "resourceType": "GMScript",
 }

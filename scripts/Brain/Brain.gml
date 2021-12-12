@@ -18,6 +18,7 @@ function Brain(_player/*:Player*/) constructor {
 		__player.get_game().accept_turn(_turn);		
 	}	
 	
+	#region getters
 	static get_selected_square = function()/*->Square?*/ {
 		return __selected_square;
 	}
@@ -25,6 +26,7 @@ function Brain(_player/*:Player*/) constructor {
 	static get_available_turns = function()/*->TurnCollection*/ {
 		return __available_turns;
 	}	
+	#endregion
 }
 
 function BrainHuman(_player/*:Player*/, _render/*:Render*/) : Brain(_player) constructor {

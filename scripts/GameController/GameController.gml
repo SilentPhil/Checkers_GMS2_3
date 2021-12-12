@@ -10,7 +10,7 @@ function GameController() constructor {
 	__board 			= new Board(self);
 	__turns_history		= new TurnHistory();
 	
-	__begin_turn();
+	__begin_new_turn();
 	
 	static step = function()/*->void*/ {
 		__current_player.step();
@@ -31,16 +31,15 @@ function GameController() constructor {
 		__turns_history.push_turn(_turn);
 		
 		var is_can_continue_attack = (_turn.is_attack() && __board.get_available_turns(__current_player, _turn.get_square_to()).is_have_attack_turns());
-		if (!is_can_continue_attack) {
-			__change_current_player();
-			__begin_turn();
+		if (is_can_continue_attack) {
+			__begin_new_turn(_turn.get_square_from());
 		} else {
-			__begin_turn(_turn.get_square_from());
+			__change_current_player();
+			__begin_new_turn();
 		}
-		// log(_turn.get_square_from().get_x_notation(), _turn.get_square_from().get_y_notation(), "->", _turn.get_square_to().get_x_notation(), _turn.get_square_to().get_y_notation());
 	}
 	
-	static __begin_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
+	static __begin_new_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
 		__current_player.begin_turn();
 	}	
 	
@@ -57,7 +56,7 @@ function GameController() constructor {
 			__current_player = last_turn.get_player();
 			__turns_history.delete_last_turn();
 			
-			__begin_turn();
+			__begin_new_turn();
 		}
 	}
 	
@@ -65,6 +64,7 @@ function GameController() constructor {
 		__current_player = get_other_player_for(__current_player);
 	}	
 	
+	#region getters
 	static get_board = function()/*->Board*/ {
 		return __board;
 	}
@@ -88,4 +88,5 @@ function GameController() constructor {
 	static get_render = function()/*->Render*/ {
 		return __render;
 	}
+	#endregion
 }

@@ -31,3 +31,8 @@ function Piece(_color/*:PIECE_COLOR*/, _player/*:Player*/) constructor {
 		return available_movement_neighbours;
 	}
 }
+
+enum PIECE_COLOR {
+	BLACK,
+	WHITE
+}
