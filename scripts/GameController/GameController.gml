@@ -1,7 +1,7 @@
 function GameController() constructor {
 	__players	= [	/// @is {Player[]}
-					new Player(self, PLAYER_SIDE.TOP), 
-					new Player(self, PLAYER_SIDE.BOTTOM)
+					new Player(self, PLAYER_SIDE.TOP,		PLAYER_BRAIN.HUMAN), 
+					new Player(self, PLAYER_SIDE.BOTTOM,	PLAYER_BRAIN.AI)
 				];
 	__current_player	= __players[PLAYER_SIDE.BOTTOM]; /// @is {Player}
 

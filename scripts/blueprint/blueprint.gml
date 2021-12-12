@@ -42,6 +42,11 @@ enum PLAYER_SIDE {
 	BOTTOM	= 1
 }
 
+enum PLAYER_BRAIN {
+	HUMAN,
+	AI
+}
+
 function Point(_x/*:number*/, _y/*:number*/) constructor {
 	x = _x;
 	y = _y;

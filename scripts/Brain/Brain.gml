@@ -1,15 +1,33 @@
 function Brain(_player/*:Player*/) constructor {
 	__player = _player; /// @is {Player}
 	
+	__selected_square	= undefined;	/// @is {Square?}
+	__available_turns	= new TurnCollection();	/// @is {TurnCollection}
+		
 	/// @virtual
 	static step = function()/*->void*/ {}
+	
+	static begin_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
+		__available_turns = __player.get_game().get_board().get_available_turns(__player, _square_from);
+	}
+	
+	static __end_turn = function()/*->void*/ {
+		__selected_square = undefined;
+		__available_turns = new TurnCollection();
+	}	
+	
+	static get_selected_square = function()/*->Square?*/ {
+		return __selected_square;
+	}
+	
+	static get_available_turns = function()/*->TurnCollection*/ {
+		return __available_turns;
+	}	
 }
 
 function BrainHuman(_player/*:Player*/, _render/*:Render*/) : Brain(_player) constructor {
-	__render			= _render;		/// @is {Render}
-	__selected_square	= undefined;	/// @is {Square?}
-	__available_turns	= new TurnCollection();	/// @is {TurnCollection}
-	
+	__render = _render;		/// @is {Render}
+
 	/// @override
 	static step = function()/*->void*/ {
 		if (mouse_check_button_released(mb_left)) {
@@ -30,25 +48,15 @@ function BrainHuman(_player/*:Player*/, _render/*:Render*/) : Brain(_player) con
 			}
 		}
 	}
-	
-	static begin_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
-		__available_turns = __player.get_game().get_board().get_available_turns(__player, _square_from);
-	}
-	
-	static __end_turn = function()/*->void*/ {
-		__selected_square = undefined;
-		__available_turns = new TurnCollection();
-	}
-	
-	static get_selected_square = function()/*->Square?*/ {
-		return __selected_square;
-	}
-	
-	static get_available_turns = function()/*->TurnCollection*/ {
-		return __available_turns;
-	}
 }
 
 function BrainAI(_player/*:Player*/) : Brain(_player) constructor {
-	
+	/// @override
+	static step = function()/*->void*/ {
+		var turn/*:Turn*/ = __available_turns.get_random();
+		if (turn != undefined) {
+			__end_turn();
+			__player.get_game().accept_turn(turn);
+		}
+	}
 }

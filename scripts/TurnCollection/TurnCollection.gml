@@ -41,4 +41,8 @@ function TurnCollection() constructor {
 	static get_array_of_turns = function()/*->Turn[]*/ {
 		return __array_of_turns;
 	}
+	
+	static get_random = function()/*->Turn?*/ {
+		return array_get_random(__array_of_turns);
+	}
 }

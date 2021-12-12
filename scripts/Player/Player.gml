@@ -1,7 +1,15 @@
-function Player(_game/*:GameController*/, _side/*:PLAYER_SIDE*/) constructor {
+function Player(_game/*:GameController*/, _side/*:PLAYER_SIDE*/, _brain_type/*:PLAYER_BRAIN*/) constructor {
 	__game = _game; /// @is {GameController}
 	__side = _side; /// @is {PLAYER_SIDE}
-	__brain = new BrainHuman(self, o_game.render); /// @is {Brain}
+	__brain_type = _brain_type; /// @is {PLAYER_BRAIN}
+	
+	
+	__brain = noone; /// @is {Brain}
+	if (__brain_type == PLAYER_BRAIN.HUMAN) {
+		__brain = new BrainHuman(self, o_game.render);
+	} else {
+		__brain = new BrainAI(self);
+	}
 	
 	static step = function()/*->void*/ {
 		__brain.step();
