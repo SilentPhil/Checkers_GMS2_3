@@ -19,7 +19,7 @@ function GameController() constructor {
 			case GAME_STATE.PLAY:
 				__current_player.step();
 				
-				if (keyboard_check_pressed(vk_space)) {
+				if (keyboard_check_pressed(vk_backspace)) {
 					__undo_last_turn();
 				}
 				if (keyboard_check_pressed(ord("R"))) {
@@ -144,6 +144,10 @@ function GameController() constructor {
 	
 	static get_game_state = function()/*->GAME_STATE*/ {
 		return __game_state;
+	}
+	
+	static get_turns_history = function()/*->TurnHistory*/ {
+		return __turns_history;
 	}
 	#endregion
 }

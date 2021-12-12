@@ -1,5 +1,4 @@
 function TurnCollection() constructor {
-	/// @todo Можно инкапсулировать пуш нового хода, создавая объект класса внутри push_turn
 	__array_of_turns = []; /// @is {Turn[]}
 	
 	static push_turn = function(_turn/*:Turn*/)/*->void*/ {

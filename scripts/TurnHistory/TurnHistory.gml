@@ -19,6 +19,10 @@ function TurnHistory() constructor {
 	static get_last_turn = function()/*->Turn?*/ {
 		return array_get_last_element(__array_of_turns);
 	}
+	
+	static get_array_of_turns = function()/*->Turn[]*/ {
+		return __array_of_turns;
+	}
 	#endregion
 		
 	/*

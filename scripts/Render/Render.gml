@@ -16,6 +16,11 @@ function Render(_game_controller/*:GameController*/) constructor {
 	];
 	
 	static draw = function()/*->void*/ {
+		if (keyboard_check(vk_space)) {
+			__draw_turns_history();
+			return;
+		}
+		
 		switch (__game_controller.get_game_state()) {
 			case GAME_STATE.PLAY:
 				__draw_gameplay();
@@ -32,7 +37,7 @@ function Render(_game_controller/*:GameController*/) constructor {
 		var current_player = __game_controller.get_current_player();
 		
 		// Рамка вокруг цвета игрока, чей сейчас ход
-		__draw_border(__piece_color[__game_controller.get_player_index(current_player)], 30);
+		__draw_border(__get_player_color(current_player), 30);
 		
 		for (var i = 0; i < board.get_width(); i++) {
 			for (var j = 0; j < board.get_height(); j++) {
@@ -108,8 +113,8 @@ function Render(_game_controller/*:GameController*/) constructor {
 		var winner/*:Player*/ = __game_controller.get_winner();
 		if (winner != undefined) {
 			var player_index = __game_controller.get_player_index(winner);
-			var player_color = __piece_color[player_index];
-			__draw_border(player_color, 150);
+			var player_color = __get_player_color(winner);
+			__draw_border(player_color, 120);
 			
 			draw_set_color(player_color);
 			draw_set_halign(fa_center);
@@ -118,10 +123,43 @@ function Render(_game_controller/*:GameController*/) constructor {
 					"Player " + string(player_index + 1) + " won!\n\n" +
 					"Press any key to new game..."
 				);
-			
 		}
 	}
 	
+	static __draw_turns_history = function()/*->void*/ {
+		draw_set_halign(fa_center);
+		draw_set_valign(fa_middle);
+		
+		var shift			= new Point(0, 0);
+		var history 		= __game_controller.get_turns_history();
+		var array_of_turns	= history.get_array_of_turns();
+		var turn_notation	= "";
+		for (var i = 0, size_i = array_length(array_of_turns); i < size_i; i++) {
+			var turn		= array_of_turns[i];
+			var player		= turn.get_player();
+			var square_from = turn.get_square_from();
+			var square_to	= turn.get_square_to();
+			
+			if (!turn.is_attack()) {
+				turn_notation += square_from.get_x_notation() + square_from.get_y_notation() + "-" + square_to.get_x_notation() + square_to.get_y_notation();
+			} else {
+				// Объединяем последующие ходы в одну запись, если они все были продолжением атаки одного игрока
+				turn_notation += square_from.get_x_notation() + square_from.get_y_notation() + ":" + square_to.get_x_notation() + square_to.get_y_notation();
+				for (var j = i + 1; j < size_i; j++) {
+					var next_turn = array_of_turns[j];
+					if (next_turn.get_player() == player && next_turn.is_attack()) {
+						turn_notation += ":" + next_turn.get_square_to().get_x_notation() + next_turn.get_square_to().get_y_notation();
+						i = j; // Неправильно так модифицировать внешний цикл, но мне уже лень делать нормально
+					} else {
+						break;
+					}
+				}
+			}
+			turn_notation += " ";
+		}
+		draw_set_color(c_ltgray);
+		draw_text_ext(__game_field.x / 2, __game_field.y / 2, turn_notation, -1, __game_field.x * 0.8);
+	}
 	
 	static __draw_border = function(_color/*:number*/, _width/*:number*/)/*->void*/ {
 		draw_set_color(_color);
@@ -132,14 +170,6 @@ function Render(_game_controller/*:GameController*/) constructor {
 	}	
 	
 	#region getters
-	static __get_square_top_left = function(__square/*:Square*/)/*->Point*/ {
-		var position = __square.get_position();
-		var X = __board_shift.x + position.x * __square_size;
-		var Y = __board_shift.y + position.y * __square_size;
-		
-		return new Point(X, Y);
-	}	
-	
 	static get_square_in_point = function(_x/*:number*/, _y/*:number*/)/*->Square?*/ {
 		var board = __game_controller.get_board();
 		var X = ceil((_x - __board_shift.x) / __square_size) - 1;
@@ -151,5 +181,17 @@ function Render(_game_controller/*:GameController*/) constructor {
 			return undefined;
 		}
 	}
+	
+	static __get_square_top_left = function(__square/*:Square*/)/*->Point*/ {
+		var position = __square.get_position();
+		var X = __board_shift.x + position.x * __square_size;
+		var Y = __board_shift.y + position.y * __square_size;
+		
+		return new Point(X, Y);
+	}	
+	
+	static __get_player_color = function(_player/*:Player*/)/*->number*/ {
+		return __piece_color[__game_controller.get_player_index(_player)];
+	}	
 	#endregion
 }
