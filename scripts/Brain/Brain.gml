@@ -19,19 +19,25 @@ function BrainHuman(_player/*:Player*/, _render/*:Render*/) : Brain(_player) con
 			var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
 			if (square_under_mouse != undefined && square_under_mouse.is_has_piece(__player)) {
 				__selected_square = square_under_mouse;
-				__available_turns = board.get_available_turns(__selected_square);
 			}
 			
 			if (__selected_square != undefined) {
-				var turn/*:Turn*/ = __available_turns.get_turn_by_square_to(square_under_mouse);
+				var turn/*:Turn*/ = __available_turns.find_turn(__selected_square, square_under_mouse);
 				if (turn != undefined) {
 					game.accept_turn(turn);
-					
-					__selected_square = undefined;
-					__available_turns = new TurnCollection();
+					__end_turn();
 				}
 			}
 		}
+	}
+	
+	static begin_turn = function()/*->void*/ {
+		__available_turns = __player.get_game().get_board().get_available_turns(__player);
+	}
+	
+	static __end_turn = function()/*->void*/ {
+		__selected_square = undefined;
+		__available_turns = new TurnCollection();
 	}
 	
 	static get_selected_square = function()/*->Square?*/ {

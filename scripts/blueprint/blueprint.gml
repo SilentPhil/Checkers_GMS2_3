@@ -38,8 +38,8 @@ enum DIRECTION {
 }
 
 enum PLAYER_SIDE {
-	TOP,
-	BOTTOM
+	TOP		= 0,
+	BOTTOM	= 1
 }
 
 function Point(_x/*:number*/, _y/*:number*/) constructor {
@@ -67,7 +67,7 @@ function array_get_safe(_array/*:array<T>*/, _index/*:number*/)/*->T?*/ {
 
 /// @template T
 function array_get_2d_safe(_array/*:T[][]*/, _i/*:number*/, _j/*:number*/)/*->T?*/ {
-	if ((_i >= 0 && _i < (array_length(_array) - 1)) && (_j >= 0 && _j < (array_length(_array[_i]) - 1))) {
+	if ((_i >= 0 && _i < array_length(_array)) && (_j >= 0 && _j < array_length(_array[_i]))) {
 		return _array[_i][_j];
 	} else {
 		return undefined;

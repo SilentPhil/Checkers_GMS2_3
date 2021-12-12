@@ -3,16 +3,22 @@ function GameController() constructor {
 					new Player(self, PLAYER_SIDE.TOP), 
 					new Player(self, PLAYER_SIDE.BOTTOM)
 				];
-	__current_player	= __players[0]; /// @is {Player}
+	__current_player	= __players[PLAYER_SIDE.BOTTOM]; /// @is {Player}
 
 	__board 			= new Board(self);
 	__turns_history		= new TurnHistory();
+	
+	__begin_turn();
+	
+	static __begin_turn = function()/*->void*/ {
+		__current_player.begin_turn();
+	}
 	
 	static step = function()/*->void*/ {
 		__current_player.step();
 		
 		if (keyboard_check_pressed(vk_space)) {
-			undo_last_turn();
+			__undo_last_turn();
 		}
 	}
 	
@@ -21,14 +27,16 @@ function GameController() constructor {
 		if (_turn.is_attack()) {
 			__board.delete_piece(_turn.get_square_under_attack());
 		}
-		
+		__change_current_player();
 		__turns_history.push_turn(_turn);
-		change_current_player();
+		__begin_turn();
 		
 		log(_turn.get_square_from().get_x_notation(), _turn.get_square_from().get_y_notation(), "->", _turn.get_square_to().get_x_notation(), _turn.get_square_to().get_y_notation());
+		/// @todo Нужно предусмотреть правило Турецкого удара https://ru.wikipedia.org/wiki/Турецкий_удар, когда буду делать ходы дамки
+		
 	}
 	
-	static undo_last_turn = function()/*->void*/ {
+	static __undo_last_turn = function()/*->void*/ {
 		var last_turn/*:Turn*/ = __turns_history.get_last_turn();
 		if (last_turn != undefined) { 
 			__board.move_piece(last_turn.get_square_to(), last_turn.get_square_from());
@@ -36,13 +44,13 @@ function GameController() constructor {
 				(last_turn.get_square_under_attack() /*#as Square*/).set_piece(last_turn.get_piece_under_attack());
 			}
 			__current_player = last_turn.get_player();
-			
 			__turns_history.delete_last_turn();
+			__begin_turn();
 		}
 	}
 	
-	static change_current_player = function()/*->void*/ {
-		__current_player = (__current_player == __players[0] ? __players[1] : __players[0]);
+	static __change_current_player = function()/*->void*/ {
+		__current_player = get_other_player_for(__current_player);
 	}	
 	
 	static get_board = function()/*->Board*/ {
@@ -57,7 +65,7 @@ function GameController() constructor {
 		return array_find_index(__players, __current_player);
 	}
 	
-	static get_other_player = function(_player/*:Player*/)/*->Player*/ {
-		return (_player == __players[0] ? __players[1] : __players[0]);
+	static get_other_player_for = function(_player/*:Player*/)/*->Player*/ {
+		return (_player == __players[PLAYER_SIDE.TOP] ? __players[PLAYER_SIDE.BOTTOM] : __players[PLAYER_SIDE.TOP]);
 	}	
 }

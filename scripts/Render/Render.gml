@@ -52,22 +52,32 @@ function Render(_game_controller/*:GameController*/) constructor {
 			draw_set_color(c_red);
 			draw_rectangle(X, Y, X + __square_size, Y + __square_size, true);
 		}
+		
 		var available_turns = (/*#cast*/ current_player.__brain /*#as BrainHuman*/).get_available_turns();
 		var array_of_available_turns = available_turns.get_array_of_turns();
 		for (var i = 0, size_i = array_length(array_of_available_turns); i < size_i; i++) {
 			var available_turn = array_of_available_turns[i];
-			var move_square_position = available_turn.get_square_to().get_position();
-			var X = __board_shift.x + move_square_position.x * __square_size;
-			var Y = __board_shift.y + move_square_position.y * __square_size;
-			draw_set_color(c_yellow);
-			draw_rectangle(X, Y, X + __square_size, Y + __square_size, true);
-			
-			if (available_turn.is_attack()) {
-				var under_attack_square_position/*:Square*/ = available_turn.get_square_under_attack().get_position();
-				var X = __board_shift.x + under_attack_square_position.x * __square_size;
-				var Y = __board_shift.y + under_attack_square_position.y * __square_size;
-				draw_set_color(c_red);
-				draw_cross(X + __square_size / 2, Y + __square_size / 2, __square_size / 2, 2, 45);
+			if (available_turn.get_square_from() == selected_square) {
+				var move_square_position = available_turn.get_square_to().get_position();
+				var X = __board_shift.x + move_square_position.x * __square_size;
+				var Y = __board_shift.y + move_square_position.y * __square_size;
+				draw_set_color(c_yellow);
+				draw_rectangle(X, Y, X + __square_size, Y + __square_size, true);
+				
+				if (available_turn.is_attack()) {
+					var under_attack_square_position/*:Square*/ = available_turn.get_square_under_attack().get_position();
+					var X = __board_shift.x + under_attack_square_position.x * __square_size;
+					var Y = __board_shift.y + under_attack_square_position.y * __square_size;
+					draw_set_color(c_red);
+					draw_cross(X + __square_size / 2, Y + __square_size / 2, __square_size / 2, 2, 45);
+				}
+			} else {
+				var move_square_position = available_turn.get_square_from().get_position();
+				var X = __board_shift.x + move_square_position.x * __square_size;
+				var Y = __board_shift.y + move_square_position.y * __square_size;
+				draw_set_color(c_green);
+				draw_rectangle(X + 5, Y + 5, X + __square_size - 5, Y + __square_size - 5, true);
+				
 			}
 		}
 	}

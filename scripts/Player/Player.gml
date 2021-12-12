@@ -14,4 +14,8 @@ function Player(_game/*:GameController*/, _side/*:PLAYER_SIDE*/) constructor {
 	static get_game = function()/*->GameController*/ {
 		return __game;
 	}
+	
+	static begin_turn = function()/*->void*/ {
+		__brain.begin_turn();
+	}
 }
