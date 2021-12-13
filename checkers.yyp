@@ -6,7 +6,6 @@
     {"id":{"name":"Render","path":"scripts/Render/Render.yy",},"order":2,},
     {"id":{"name":"Board","path":"scripts/Board/Board.yy",},"order":0,},
     {"id":{"name":"GameController","path":"scripts/GameController/GameController.yy",},"order":0,},
-    {"id":{"name":"Font1","path":"fonts/Font1/Font1.yy",},"order":0,},
     {"id":{"name":"array_scripts","path":"scripts/array_scripts/array_scripts.yy",},"order":0,},
     {"id":{"name":"Turn","path":"scripts/Turn/Turn.yy",},"order":1,},
     {"id":{"name":"Player","path":"scripts/Player/Player.yy",},"order":0,},
