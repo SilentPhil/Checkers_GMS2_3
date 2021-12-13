@@ -6,6 +6,7 @@ function Turn(_player/*:Player*/, _square_from/*:Square*/, _square_to/*:Square*/
 	
 	__piece 				= __square_from.get_piece();	/// @is {Piece}
 	__piece_under_attack	= undefined;					/// @is {Piece?}
+	
 	if (__square_under_attack != undefined) {
 		__piece_under_attack = __square_under_attack.get_piece();
 	}

@@ -13,6 +13,10 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:int<SQU
 		__piece = undefined;
 	}
 	
+	static set_neighbour = function(_direction/*:int<DIRECTION>*/, _other_square/*:Square*/)/*->void*/ {
+		__neighbours[@ _direction] = _other_square;
+	}
+	
 	#region getters
 	static is_black = function()/*->bool*/ {
 		return (__color == SQUARE_COLOR.BLACK);
@@ -57,7 +61,8 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:int<SQU
 		return __position;
 	}
 	
-	/// @desc Возвращает соседнюю черную клетку в указанном направлении. Дистанция определяет, какой сосед будет браться - ближайший (если 1) или последующе (если > 1)
+	/// @desc Возвращает соседнюю черную клетку в указанном направлении. 
+	/// @desc Дистанция определяет, какой сосед будет браться - ближайший (если 1) или последующие (если > 1)
 	static get_neighbour = function(_side/*:int<DIRECTION>*/, _distance/*:number*/ = 1)/*->Square?*/ {
 		if (_distance == 1) {
 			return __neighbours[_side];
@@ -78,7 +83,8 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:int<SQU
 	}
 	
 	static get_x_notation = function()/*->string*/ {
-		return string(chr(97 + __position.x));
+		var unicode_small_eng_a = 97;
+		return string(chr(unicode_small_eng_a + __position.x));
 	}
 	
 	static get_y_notation = function()/*->string*/ {

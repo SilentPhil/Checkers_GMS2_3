@@ -8,7 +8,7 @@ function Board(_game/*:GameController*/) constructor {
 	// Расстановка клеток
 	for (var i = 0; i < __width; i++) {
 		for (var j = 0; j < __height; j++) {
-			var color = ((1 + i mod 2 + j mod 2) mod 2) /*#as int<SQUARE_COLOR>*/;
+			var color/*:int<SQUARE_COLOR>*/ = ((1 + i mod 2 + j mod 2) mod 2);
 			__squares[i][j] = new Square(self, i, j, color);
 		}
 	}
@@ -18,10 +18,11 @@ function Board(_game/*:GameController*/) constructor {
 		for (var j = 0; j < __height; j++) {
 			var square = __squares[i][j];
 			if (square.is_black()) {
-				square.__neighbours[@ DIRECTION.NW] = array_get_2d_safe(__squares, i - 1, j - 1);
-				square.__neighbours[@ DIRECTION.NE] = array_get_2d_safe(__squares, i + 1, j - 1);
-				square.__neighbours[@ DIRECTION.SE] = array_get_2d_safe(__squares, i + 1, j + 1);
-				square.__neighbours[@ DIRECTION.SW] = array_get_2d_safe(__squares, i - 1, j + 1);
+				square.set_neighbour(DIRECTION.NW, array_get_2d_safe(__squares, i - 1, j - 1));
+				square.set_neighbour(DIRECTION.NE, array_get_2d_safe(__squares, i + 1, j - 1));
+				square.set_neighbour(DIRECTION.SE, array_get_2d_safe(__squares, i + 1, j + 1));
+				square.set_neighbour(DIRECTION.SW, array_get_2d_safe(__squares, i - 1, j + 1));
+				
 			}
 		}
 	}
@@ -69,38 +70,42 @@ function Board(_game/*:GameController*/) constructor {
 				for (var j = 1; j <= attack_max_distance; j++) {
 					var square_under_attack/*:Square*/	= _square_attack_from.get_neighbour(attack_direction, j);
 					// Найдена клетка с шашкой врага
-					if (square_under_attack != undefined && square_under_attack.is_has_piece(__game.get_other_player_for(player))) {
-						// Ищем свободные клетки за шашкой врага
-						
-						// В этой коллекции будут храниться ходы с клетками, с которых можно продолжить атаку
-						var turns_with_future_attacks		= new TurnCollection();
-						// В этой коллекции будут храниться ходы с клетками, с которых нельзя продолжить атаку
-						var turns_without_future_attacks	= new TurnCollection();
-						
-						for (var k = 1; k <= attack_max_distance; k++) {
-							var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction, k);
-							if (square_attack_to != undefined && !square_attack_to.is_has_piece()) {
-								var turn = new Turn(player, _square_attack_from, square_attack_to, square_under_attack);
-								
-								if (__is_can_attack_from_square(player, square_attack_to, attack_max_distance, __get_direction_normals(attack_direction))) {
-									turns_with_future_attacks.push_turn(turn);
+					if (square_under_attack != undefined) {
+						if (square_under_attack.is_has_piece(__game.get_other_player_for(player))) {
+							// Ищем свободные клетки за шашкой врага
+							
+							// В этой коллекции будут храниться ходы с клетками, с которых можно продолжить атаку
+							var turns_with_future_attacks		= new TurnCollection();
+							// В этой коллекции будут храниться ходы с клетками, с которых нельзя продолжить атаку
+							var turns_without_future_attacks	= new TurnCollection();
+							
+							for (var k = 1; k <= attack_max_distance; k++) {
+								var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction, k);
+								if (square_attack_to != undefined && !square_attack_to.is_has_piece()) {
+									var turn = new Turn(player, _square_attack_from, square_attack_to, square_under_attack);
+									
+									if (__is_can_attack_from_square(player, square_attack_to, attack_max_distance, __get_direction_normals(attack_direction))) {
+										turns_with_future_attacks.push_turn(turn);
+									} else {
+										turns_without_future_attacks.push_turn(turn);
+									}
 								} else {
-									turns_without_future_attacks.push_turn(turn);
+									break; // Если достигли конца доски или встретили хоть одну шашку, то дальше свободные клетки не ищем
 								}
-							} else {
-								break; // Если достигли конца доски или встретили хоть одну шашку, то дальше свободные клетки не ищем
 							}
+							
+							/// Если среди клеток, на которых можно остановиться, будут клетки, с которых можно продолжить атаку
+							/// То нужно добавить в итоговую коллекцию только их
+							if (!turns_with_future_attacks.is_empty()) {
+								_turn_collection.push_collection(turns_with_future_attacks);
+							} else {
+								_turn_collection.push_collection(turns_without_future_attacks);
+							}
+							
+							break; // Т.к. шашку врага уже нашли - в этом направлении дальше искать врагов смысла нет
+						} else if (square_under_attack.is_has_piece(player)) {
+							break; // Уперлись в свою шашку
 						}
-						
-						/// Если среди клеток, на которых можно остановиться, будут клетки, с которых можно продолжить атаку
-						/// То нужно добавить в итоговую коллекцию только их
-						if (!turns_with_future_attacks.is_empty()) {
-							_turn_collection.push_collection(turns_with_future_attacks);
-						} else {
-							_turn_collection.push_collection(turns_without_future_attacks);
-						}
-						
-						break; // Т.к. шашку врага уже нашли - в этом направлении дальше искать врагов смысла нет
 					}
 				}
 			}
@@ -112,14 +117,18 @@ function Board(_game/*:GameController*/) constructor {
 			var attack_direction = _directions[i];
 			for (var j = 1; j <= _max_distance; j++) {
 				var square_under_attack/*:Square*/ = _square_from.get_neighbour(attack_direction, j);
-				if (square_under_attack != undefined && square_under_attack.is_has_piece(__game.get_other_player_for(_player))) {
-					for (var k = 1; k <= _max_distance; k++) {
-						var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction, k);
-						if (square_attack_to != undefined && !square_attack_to.is_has_piece()) {
-							return true;
+				if (square_under_attack != undefined) {
+					if (square_under_attack.is_has_piece(__game.get_other_player_for(_player))) {
+						for (var k = 1; k <= _max_distance; k++) {
+							var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction, k);
+							if (square_attack_to != undefined && !square_attack_to.is_has_piece()) {
+								return true;
+							}
 						}
+					} else if (square_under_attack.is_has_piece(_player)) {
+						break;
 					}
-				}
+				} 
 			}
 		}
 		return false;

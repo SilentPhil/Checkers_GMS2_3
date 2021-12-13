@@ -79,7 +79,7 @@ function Render(_game_controller/*:GameController*/) constructor {
 	 		var selected_square/*:Square*/ = brain.get_selected_square();
 			if (selected_square != undefined) {
 				var pos = __get_square_top_left(selected_square);
-				draw_set_color(c_red);
+				draw_set_color(c_white);
 				draw_rectangle(pos.x, pos.y, pos.x + __square_size, pos.y + __square_size, true);
 			}
 			
@@ -139,12 +139,11 @@ function Render(_game_controller/*:GameController*/) constructor {
 			var player		= turn.get_player();
 			var square_from = turn.get_square_from();
 			var square_to	= turn.get_square_to();
+			turn_notation  += square_from.get_x_notation() + square_from.get_y_notation() + "-" + square_to.get_x_notation() + square_to.get_y_notation();
 			
 			if (!turn.is_attack()) {
-				turn_notation += square_from.get_x_notation() + square_from.get_y_notation() + "-" + square_to.get_x_notation() + square_to.get_y_notation();
 			} else {
 				// Объединяем последующие ходы в одну запись, если они все были продолжением атаки одного игрока
-				turn_notation += square_from.get_x_notation() + square_from.get_y_notation() + ":" + square_to.get_x_notation() + square_to.get_y_notation();
 				for (var j = i + 1; j < size_i; j++) {
 					var next_turn = array_of_turns[j];
 					if (next_turn.get_player() == player && next_turn.is_attack()) {

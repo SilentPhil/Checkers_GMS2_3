@@ -1,4 +1,6 @@
 function GameController() constructor {
+	randomize();
+	
 	__render			= new Render(self);
 	
 	__players			= [	/// @is {Player[]}
@@ -106,21 +108,22 @@ function GameController() constructor {
 	}
 	
 	static __check_game_end = function()/*->void*/ {
-		var player_top		= __players[PLAYER_SIDE.TOP];
-		var player_bottom	= __players[PLAYER_SIDE.BOTTOM];
+		var top_player		= __players[PLAYER_SIDE.TOP];
+		var bottom_player	= __players[PLAYER_SIDE.BOTTOM];
 		
-		var is_no_pieces_player_top = array_is_empty(__board.get_array_of_pieces_squares_for_player(player_top));
-		var is_no_turns_player_top	= __board.get_available_turns(player_top).is_empty();
-		if (is_no_pieces_player_top || is_no_turns_player_top) {
-			__game_end(player_bottom);
+		var is_no_pieces_top_player = array_is_empty(__board.get_array_of_pieces_squares_for_player(top_player));
+		var is_no_turns_top_player	= __board.get_available_turns(top_player).is_empty();
+		if (is_no_pieces_top_player || is_no_turns_top_player) {
+			__game_end(bottom_player);
 			return;
 		}	
-		var is_no_pieces_player_bottom	= array_is_empty(__board.get_array_of_pieces_squares_for_player(player_bottom));
-		var is_no_turns_player_bottom	= __board.get_available_turns(player_bottom).is_empty();
-		if (is_no_pieces_player_bottom || is_no_turns_player_bottom) {
-			__game_end(player_top);
+		var is_no_pieces_bottom_player	= array_is_empty(__board.get_array_of_pieces_squares_for_player(bottom_player));
+		var is_no_turns_bottom_player	= __board.get_available_turns(bottom_player).is_empty();
+		if (is_no_pieces_bottom_player || is_no_turns_bottom_player) {
+			__game_end(top_player);
 			return;
 		}
+		
 		/// @todo Сюда еще можно добавить остальные варианты завершения игры, будь то ходьба дамкой > 15 ходов подряд и т.д. См. википедию.
 	}
 	
