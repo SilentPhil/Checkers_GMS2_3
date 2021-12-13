@@ -2,7 +2,7 @@ function GameController() constructor {
 	__render			= new Render(self);
 	
 	__players			= [	/// @is {Player[]}
-							new Player(self, PLAYER_SIDE.TOP,		PLAYER_BRAIN.HUMAN), 
+							new Player(self, PLAYER_SIDE.TOP,		PLAYER_BRAIN.AI), 
 							new Player(self, PLAYER_SIDE.BOTTOM,	PLAYER_BRAIN.HUMAN)
 						];
 	__current_player	= __players[PLAYER_SIDE.BOTTOM]; /// @is {Player}
@@ -27,41 +27,32 @@ function GameController() constructor {
 				}
 				
 				#region debug - Добавление и удаление шашек
-				if (keyboard_check_pressed(ord("Z"))) {
-					var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
-					if (square_under_mouse != undefined && square_under_mouse.is_black()) {
+				var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
+				if (square_under_mouse != undefined && square_under_mouse.is_black()) {
+					if (keyboard_check_pressed(ord("Z"))) {
 						square_under_mouse.set_piece(new Piece(PIECE_COLOR.BLACK, __players[PLAYER_SIDE.TOP]));
-						__begin_new_turn();
 					}
-				}
-				if (keyboard_check_pressed(ord("X"))) {
-					var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
-					if (square_under_mouse != undefined && square_under_mouse.is_black()) {
+					if (keyboard_check_pressed(ord("X"))) {
 						square_under_mouse.set_piece(new Piece(PIECE_COLOR.WHITE, __players[PLAYER_SIDE.BOTTOM]));
-						__begin_new_turn();
-					}
-				}				
-				if (keyboard_check_pressed(ord("C"))) {
-					var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
-					if (square_under_mouse != undefined && square_under_mouse.is_black()) {
+					}				
+					if (keyboard_check_pressed(ord("C"))) {
 						square_under_mouse.reset_piece();
-						__begin_new_turn();
 					}
-				}			
-				if (keyboard_check_pressed(ord("V"))) {
-					var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
-					if (square_under_mouse != undefined && square_under_mouse.is_has_piece()) {
-						var piece/*:Piece*/ = square_under_mouse.get_piece();
-						piece.set_king(!piece.is_king());
+					if (keyboard_check_pressed(ord("V"))) {
+						if (square_under_mouse.is_has_piece()) {
+							var piece/*:Piece*/ = square_under_mouse.get_piece();
+							piece.set_king(!piece.is_king());
+						}
+					}
+					if (keyboard_check_pressed(vk_anykey)) {
 						__begin_new_turn();
 					}
 				}
 				#endregion
-				
 			break;
 			
 			case GAME_STATE.END:
-				if (keyboard_check_pressed(vk_anykey)) {
+				if (keyboard_check_released(vk_anykey)) {
 					__restart();
 				}
 			break;
@@ -80,7 +71,7 @@ function GameController() constructor {
 		
 		var is_can_continue_attack = (_turn.is_attack() && __board.get_available_turns(__current_player, _turn.get_square_to()).is_have_attack_turns());
 		if (is_can_continue_attack) {
-			__begin_new_turn(_turn.get_square_from());
+			__begin_new_turn(_turn.get_square_to());
 		} else {
 			__change_current_player();
 			__begin_new_turn();
@@ -107,10 +98,10 @@ function GameController() constructor {
 	}	
 	
 	static __restart = function()/*->void*/ {
-		__board	= new Board(self);
-		__turns_history.clear();
+		__board				= new Board(self);
 		__game_state		= GAME_STATE.PLAY;
 		__current_player	= __players[PLAYER_SIDE.BOTTOM];
+		__turns_history.clear();
 		__begin_new_turn();
 	}
 	
@@ -130,7 +121,7 @@ function GameController() constructor {
 			__game_end(player_top);
 			return;
 		}
-		// Сюда еще можно добавить остальные варианты завершения игры, будь то ходьба дамкой > 15 ходов подряд и т.д. См. википедию.
+		/// @todo Сюда еще можно добавить остальные варианты завершения игры, будь то ходьба дамкой > 15 ходов подряд и т.д. См. википедию.
 	}
 	
 	static __game_end = function(_winner/*:Player?*/)/*->void*/ {
@@ -139,7 +130,7 @@ function GameController() constructor {
 	}
 	
 	static __begin_new_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
-		__current_player.begin_turn();
+		__current_player.begin_turn(_square_from);
 	}	
 	
 	static __change_current_player = function()/*->void*/ {

@@ -14,8 +14,8 @@ function Player(_game/*:GameController*/, _side/*:int<PLAYER_SIDE>*/, _brain_typ
 		break;
 	}
 	
-	static begin_turn = function()/*->void*/ {
-		__brain.begin_turn();
+	static begin_turn = function(_selected_square/*:Square*/ = undefined)/*->void*/ {
+		__brain.begin_turn(_selected_square);
 	}	
 	
 	static step = function()/*->void*/ {

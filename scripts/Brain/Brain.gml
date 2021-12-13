@@ -7,8 +7,9 @@ function Brain(_player/*:Player*/) constructor {
 	/// @virtual
 	static step = function()/*->void*/ {}
 	
-	static begin_turn = function(_square_from/*:Square*/ = undefined)/*->void*/ {
-		__available_turns = __player.get_game().get_board().get_available_turns(__player, _square_from);
+	static begin_turn = function(_selected_square/*:Square*/ = undefined)/*->void*/ {
+		__available_turns = __player.get_game().get_board().get_available_turns(__player, _selected_square);
+		__selected_square = _selected_square;
 	}
 	
 	static __make_turn = function(_turn/*:Turn*/)/*->void*/ {

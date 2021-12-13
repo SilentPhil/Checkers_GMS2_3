@@ -33,8 +33,8 @@ function Render(_game_controller/*:GameController*/) constructor {
 	}
 	
 	static __draw_gameplay = function()/*->void*/ {
-		var board = __game_controller.get_board();
-		var current_player = __game_controller.get_current_player();
+		var board			= __game_controller.get_board();
+		var current_player	= __game_controller.get_current_player();
 		
 		// Рамка вокруг цвета игрока, чей сейчас ход
 		__draw_border(__get_player_color(current_player), 30);
@@ -90,8 +90,8 @@ function Render(_game_controller/*:GameController*/) constructor {
 				if (available_turn.get_square_from() == selected_square) {
 					// Куда можно походить выбранной шашкой
 					var pos = __get_square_top_left(available_turn.get_square_to());
-					draw_set_color(c_yellow);
-					draw_rectangle(pos.x, pos.y, pos.x + __square_size, pos.y + __square_size, true);
+					draw_set_color(c_orange);
+					draw_rectangle(pos.x + 3, pos.y + 3, pos.x + __square_size - 3, pos.y + __square_size - 3, true);
 					
 					// Кто будет срублен атакой выбранной шашкой
 					if (available_turn.is_attack()) {
@@ -103,7 +103,7 @@ function Render(_game_controller/*:GameController*/) constructor {
 					// Шашки, которые могут походить
 					var pos = __get_square_top_left(available_turn.get_square_from());
 					draw_set_color(c_green);
-					draw_rectangle(pos.x + 5, pos.y + 5, pos.x + __square_size - 5, pos.y + __square_size - 5, true);
+					draw_rectangle(pos.x + 3, pos.y + 3, pos.x + __square_size - 3, pos.y + __square_size - 3, true);
 				}
 			}
 		}
