@@ -1,7 +1,7 @@
-function Player(_game/*:GameController*/, _side/*:PLAYER_SIDE*/, _brain_type/*:PLAYER_BRAIN*/) constructor {
+function Player(_game/*:GameController*/, _side/*:int<PLAYER_SIDE>*/, _brain_type/*:int<PLAYER_BRAIN>*/) constructor {
 	__game			= _game;		/// @is {GameController}
-	__side			= _side;		/// @is {PLAYER_SIDE}
-	__brain_type	= _brain_type;	/// @is {PLAYER_BRAIN}
+	__side			= _side;		/// @is {int<PLAYER_SIDE>}
+	__brain_type	= _brain_type;	/// @is {int<PLAYER_BRAIN>}
 	
 	__brain 		= noone; /// @is {Brain}
 	switch (__brain_type) {
@@ -23,7 +23,7 @@ function Player(_game/*:GameController*/, _side/*:PLAYER_SIDE*/, _brain_type/*:P
 	}
 	
 	#region getters
-	static get_side = function()/*->PLAYER_SIDE*/ {
+	static get_side = function()/*->int<PLAYER_SIDE>*/ {
 		return __side;
 	}
 	

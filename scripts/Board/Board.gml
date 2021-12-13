@@ -8,7 +8,7 @@ function Board(_game/*:GameController*/) constructor {
 	// Расстановка клеток
 	for (var i = 0; i < __width; i++) {
 		for (var j = 0; j < __height; j++) {
-			var color = /*#cast*/ ((1 + i mod 2 + j mod 2) mod 2) /*#as SQUARE_COLOR*/;
+			var color = ((1 + i mod 2 + j mod 2) mod 2) /*#as int<SQUARE_COLOR>*/;
 			__squares[i][j] = new Square(self, i, j, color);
 		}
 	}
@@ -57,13 +57,15 @@ function Board(_game/*:GameController*/) constructor {
 			var piece/*:Piece*/ = _square_attack_from.get_piece();
 			var player		= piece.get_player();
 					
-			var available_attack_directions/*:array<DIRECTION>*/ = [DIRECTION.NW, DIRECTION.NE, DIRECTION.SW, DIRECTION.SE];
+			var available_attack_directions/*:int<DIRECTION>[]*/ = [DIRECTION.NW, DIRECTION.NE, DIRECTION.SW, DIRECTION.SE];
 			if (piece.is_king()) {
 				var attack_max_distance = max(get_width(), get_height());
 			} else {
 				var attack_max_distance = 1;
 			}
-					
+			
+			
+			
 			for (var i = 0, size_i = array_length(available_attack_directions); i < size_i; i++) {
 				var attack_direction = available_attack_directions[i];
 				for (var j = 1; j <= attack_max_distance; j++) {
@@ -71,6 +73,10 @@ function Board(_game/*:GameController*/) constructor {
 					// Найдена клетка с шашкой врага
 					if (square_under_attack != undefined && square_under_attack.is_has_piece(__game.get_other_player_for(player))) {
 						// Ищим свободные клетки за шашкой врага
+						
+						/// @todo Если среди этих клеток будет хоть одна, с которой можно атаковать в перпендикулярные текущему направлению стороны,
+						/// то среди возможных ходов должны быть только клетки с возможностью атаки
+						
 						for (var k = 1; k <= attack_max_distance; k++) {
 							var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction, k);
 							if (square_attack_to != undefined && !square_attack_to.is_has_piece()) {
@@ -95,10 +101,10 @@ function Board(_game/*:GameController*/) constructor {
 			var player		= piece.get_player();
 			
 			if (piece.is_king()) {
-				var available_movement_directions/*:array<DIRECTION>*/ = [DIRECTION.NW, DIRECTION.NE, DIRECTION.SW, DIRECTION.SE];
+				var available_movement_directions/*:int<DIRECTION>[]*/ = [DIRECTION.NW, DIRECTION.NE, DIRECTION.SW, DIRECTION.SE];
 				var move_max_distance = max(get_width(), get_height());
 			} else {
-				var available_movement_directions/*:array<DIRECTION>*/ = piece.get_available_movement_directions();
+				var available_movement_directions/*:int<DIRECTION>[]*/ = piece.get_available_movement_directions();
 				var move_max_distance = 1;
 			}
 			

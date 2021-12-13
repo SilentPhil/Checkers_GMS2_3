@@ -1,5 +1,5 @@
-function Piece(_color/*:PIECE_COLOR*/, _player/*:Player*/) constructor {
-	__color 	= _color;	/// @is {PIECE_COLOR}
+function Piece(_color/*:int<PIECE_COLOR>*/, _player/*:Player*/) constructor {
+	__color 	= _color;	/// @is {int<PIECE_COLOR>}
 	__player	= _player;	/// @is {Player}
 	__is_king	= false;
 	
@@ -15,12 +15,12 @@ function Piece(_color/*:PIECE_COLOR*/, _player/*:Player*/) constructor {
 		return __player;
 	}
 	
-	static get_color = function()/*->PIECE_COLOR*/ {
+	static get_color = function()/*->int<PIECE_COLOR>*/ {
 		return __color;
 	}	
 	
-	static get_available_movement_directions = function()/*->DIRECTION[]*/ {
-		var available_movement_neighbours/*:DIRECTION[]*/ = [];
+	static get_available_movement_directions = function()/*->int<DIRECTION>[]*/ {
+		var available_movement_neighbours/*:int<DIRECTION>[]*/ = [];
 		
 		if (__player.get_side() == PLAYER_SIDE.TOP) {
 			return [DIRECTION.SE, DIRECTION.SW];

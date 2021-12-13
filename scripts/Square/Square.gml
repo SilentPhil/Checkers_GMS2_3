@@ -1,7 +1,7 @@
-function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:SQUARE_COLOR*/) constructor {
+function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:int<SQUARE_COLOR>*/) constructor {
 	__board 		= _board;				/// @is {Board}
 	__position		= new Point(_x, _y);	/// @is {Point}
-	__color 		= _color;				/// @is {SQUARE_COLOR}
+	__color 		= _color;				/// @is {int<SQUARE_COLOR>}
 	__piece 		= undefined;			/// @is {Piece?}
 	__neighbours	= /*#cast*/ array_create(DIRECTION.SIZEOF, undefined); /// @is {Square?[]}
 	
@@ -18,7 +18,7 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:SQUARE_
 		return (__color == SQUARE_COLOR.BLACK);
 	}
 	
-	static get_color = function()/*->SQUARE_COLOR*/ {
+	static get_color = function()/*->int<SQUARE_COLOR>*/ {
 		return __color;
 	}
 	
@@ -58,11 +58,11 @@ function Square(_board/*:Board*/, _x/*:number*/, _y/*:number*/, _color/*:SQUARE_
 	}
 	
 	/// @desc Возвращает соседнюю черную клетку в указанном направлении. Дистанция определяет, какой сосед будет браться - ближайший (если 1) или последующе (если > 1)
-	static get_neighbour = function(_side/*:DIRECTION*/, _distance/*:number*/ = 1)/*->Square?*/ {
+	static get_neighbour = function(_side/*:int<DIRECTION>*/, _distance/*:number*/ = 1)/*->Square?*/ {
 		if (_distance == 1) {
-			return __neighbours[/*#cast*/ _side];
+			return __neighbours[_side];
 		} else {
-			var neighbour/*:Square*/ = __neighbours[/*#cast*/ _side];
+			var neighbour/*:Square*/ = __neighbours[_side];
 			if (neighbour != undefined) {
 				repeat (_distance - 1) {
 					neighbour = neighbour.get_neighbour(_side);

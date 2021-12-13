@@ -60,13 +60,13 @@ function Render(_game_controller/*:GameController*/) constructor {
 				}
 
 				// Клетки
-				draw_set_color(__square_color[/*#cast*/ square.get_color()]);
+				draw_set_color(__square_color[square.get_color()]);
 				draw_rectangle(pos.x, pos.y, pos.x + __square_size, pos.y + __square_size, false);
 				
 				// Шашки
 				if (square.is_has_piece()) {
 					var piece/*:Piece*/ = square.get_piece();
-					draw_set_color(__piece_color[/*#cast*/ piece.get_color()]);
+					draw_set_color(__piece_color[piece.get_color()]);
 					draw_circle(pos.x + __square_size / 2, pos.y + __square_size / 2, __piece_size, piece.is_king());
 				}
 			}

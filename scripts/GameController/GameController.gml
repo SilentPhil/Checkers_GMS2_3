@@ -2,15 +2,15 @@ function GameController() constructor {
 	__render			= new Render(self);
 	
 	__players			= [	/// @is {Player[]}
-							new Player(self, PLAYER_SIDE.TOP,		PLAYER_BRAIN.AI), 
+							new Player(self, PLAYER_SIDE.TOP,		PLAYER_BRAIN.HUMAN), 
 							new Player(self, PLAYER_SIDE.BOTTOM,	PLAYER_BRAIN.HUMAN)
 						];
 	__current_player	= __players[PLAYER_SIDE.BOTTOM]; /// @is {Player}
 
 	__board 			= new Board(self);
 	__turns_history		= new TurnHistory();
-	__game_state		= GAME_STATE.PLAY;
-	__game_winner		= undefined; /// @is {Player?}
+	__game_state		= GAME_STATE.PLAY;	/// @is {int<GAME_STATE>}
+	__game_winner		= undefined;		/// @is {Player?}
 	
 	__begin_new_turn();
 	
@@ -45,6 +45,14 @@ function GameController() constructor {
 					var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
 					if (square_under_mouse != undefined && square_under_mouse.is_black()) {
 						square_under_mouse.reset_piece();
+						__begin_new_turn();
+					}
+				}			
+				if (keyboard_check_pressed(ord("V"))) {
+					var square_under_mouse/*:Square*/ = __render.get_square_in_point(mouse_x, mouse_y);
+					if (square_under_mouse != undefined && square_under_mouse.is_has_piece()) {
+						var piece/*:Piece*/ = square_under_mouse.get_piece();
+						piece.set_king(!piece.is_king());
 						__begin_new_turn();
 					}
 				}
@@ -167,7 +175,7 @@ function GameController() constructor {
 		return __game_winner;
 	}
 	
-	static get_game_state = function()/*->GAME_STATE*/ {
+	static get_game_state = function()/*->int<GAME_STATE>*/ {
 		return __game_state;
 	}
 	
