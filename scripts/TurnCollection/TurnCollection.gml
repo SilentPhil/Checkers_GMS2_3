@@ -5,6 +5,13 @@ function TurnCollection() constructor {
 		array_push(__array_of_turns, _turn);
 	}
 	
+	static push_collection = function(_turn_collection/*:TurnCollection*/)/*->void*/ {
+		var array_of_turns = _turn_collection.get_array_of_turns();
+		for (var i = 0, size_i = array_length(array_of_turns); i < size_i; i++) {
+			push_turn(array_of_turns[i]);
+		}
+	}
+	
 	#region getters
 	static is_turn_exists = function(_square_to/*:Square*/)/*->bool*/ {
 		for (var i = 0, size_i = array_length(__array_of_turns); i < size_i; i++) {

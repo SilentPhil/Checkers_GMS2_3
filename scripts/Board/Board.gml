@@ -63,34 +63,74 @@ function Board(_game/*:GameController*/) constructor {
 			} else {
 				var attack_max_distance = 1;
 			}
-			
-			
-			
+
 			for (var i = 0, size_i = array_length(available_attack_directions); i < size_i; i++) {
 				var attack_direction = available_attack_directions[i];
 				for (var j = 1; j <= attack_max_distance; j++) {
 					var square_under_attack/*:Square*/	= _square_attack_from.get_neighbour(attack_direction, j);
 					// Найдена клетка с шашкой врага
 					if (square_under_attack != undefined && square_under_attack.is_has_piece(__game.get_other_player_for(player))) {
-						// Ищим свободные клетки за шашкой врага
+						// Ищем свободные клетки за шашкой врага
 						
-						/// @todo Если среди этих клеток будет хоть одна, с которой можно атаковать в перпендикулярные текущему направлению стороны,
-						/// то среди возможных ходов должны быть только клетки с возможностью атаки
+						// В этой коллекции будут храниться ходы с клетками, с которых можно продолжить атаку
+						var turns_with_future_attacks		= new TurnCollection();
+						// В этой коллекции будут храниться ходы с клетками, с которых нельзя продолжить атаку
+						var turns_without_future_attacks	= new TurnCollection();
 						
 						for (var k = 1; k <= attack_max_distance; k++) {
 							var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction, k);
 							if (square_attack_to != undefined && !square_attack_to.is_has_piece()) {
-								_turn_collection.push_turn(new Turn(player, _square_attack_from, square_attack_to, square_under_attack));
+								var turn = new Turn(player, _square_attack_from, square_attack_to, square_under_attack);
+								
+								if (__is_can_attack_from_square(player, square_attack_to, attack_max_distance, __get_direction_normals(attack_direction))) {
+									turns_with_future_attacks.push_turn(turn);
+								} else {
+									turns_without_future_attacks.push_turn(turn);
+								}
 							} else {
-								// Если достигли конца доски или встретили хоть одну шашку, то дальше свободные клетки не ищим
-								break;
+								break; // Если достигли конца доски или встретили хоть одну шашку, то дальше свободные клетки не ищем
 							}
 						}
-						// Т.к. шашку врага уже нашли - в этом направлении дальше искать врагов смысла нет
-						break;
+						
+						/// Если среди клеток, на которых можно остановиться, будут клетки, с которых можно продолжить атаку
+						/// То нужно добавить в итоговую коллекцию только их
+						if (!turns_with_future_attacks.is_empty()) {
+							_turn_collection.push_collection(turns_with_future_attacks);
+						} else {
+							_turn_collection.push_collection(turns_without_future_attacks);
+						}
+						
+						break; // Т.к. шашку врага уже нашли - в этом направлении дальше искать врагов смысла нет
 					}
 				}
 			}
+		}
+	}
+	
+	static __is_can_attack_from_square = function(_player/*:Player*/, _square_from/*:Square*/, _max_distance/*:number*/, _directions/*:int<DIRECTION>[]*/)/*->bool*/ {
+		for (var i = 0, size_i = array_length(_directions); i < size_i; i++) {
+			var attack_direction = _directions[i];
+			for (var j = 1; j <= _max_distance; j++) {
+				var square_under_attack/*:Square*/ = _square_from.get_neighbour(attack_direction, j);
+				if (square_under_attack != undefined && square_under_attack.is_has_piece(__game.get_other_player_for(_player))) {
+					for (var k = 1; k <= _max_distance; k++) {
+						var square_attack_to/*:Square*/ = square_under_attack.get_neighbour(attack_direction, k);
+						if (square_attack_to != undefined && !square_attack_to.is_has_piece()) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	/// @desc Возвращает массив с направлениями, перпендикулярными указанному направлению
+	static __get_direction_normals = function(_direction/*:int<DIRECTION>*/)/*->int<DIRECTION>[]*/ {
+		if (_direction == DIRECTION.NW || _direction == DIRECTION.SE) {
+			return [DIRECTION.NE, DIRECTION.SW];
+		} else {
+			return [DIRECTION.NW, DIRECTION.SE];
 		}
 	}
 	
